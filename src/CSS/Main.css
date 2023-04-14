@@ -1,0 +1,103 @@
+body{
+ font-family: arial;
+ background-image: url(/Lernprogramm/src/CSS/BackgroundImage.jpg);
+ background-color: gray;
+ background-repeat: no-repeat;
+ background-position: center;
+ height: 750px;
+ background-size: cover;
+ background-color: #4b4b4b;
+}
+
+header{
+ margin-top: -8px;
+ right: 0;
+ padding: 5px;
+ background-color: rgba(0,0,0,0.8);
+ margin-left: -8px;
+ margin-right: -8px;
+}
+
+h2{
+ color: white;
+ background-size: 100%;
+ text-align: center;
+}
+
+.sidebar {
+ height: 100%;
+ width: 100px;
+ position: absolute;
+ left: 0;
+ top: 0;
+ padding-top: 40px;
+ background-color: gray;
+ opacity: 0.7;
+ width: fit-content;
+
+ transition-property: background-color, font-size, transform, color, margin;
+ transition-timing-function: ease-in-out;
+ transition-duration: 1s;
+}
+
+h1{
+ margin-top: -40px;
+ padding-top: 30px;
+ padding-bottom: 25px;
+ background-color: black;
+ color: white;
+ font-size: 20px;
+ text-align: center;
+ text-decoration: underline;
+ top: 0;
+ left: 0;
+}
+
+.topic {
+ color: white;
+ font-size: 20px;
+ text-align: center;
+ margin-top: 30px;
+ border-radius: 5px;
+ border: solid black 1px;
+ background-color: rgba(0,0,0,0.3);
+ display: block;
+}
+
+
+.handlerPlaceholder{
+ position: absolute;
+ left: 0;
+ top: 50%;
+
+ background-color: gray;
+ opacity: 1;
+ width: fit-content;
+ margin-left: 120px;
+
+ transition-property: background-color, font-size, transform, color, margin;
+ transition-timing-function: ease-in-out;
+ transition-duration: 1s;
+}
+
+.handler{
+ /*top:0%; /*50%*/
+ /*left:0%; /*86%*/
+ padding-top: 0px;
+ height:60px;
+ position: absolute;
+ /*margin-left: 0px;*/
+
+
+ background-color: rgba(0,0,0,0.1);
+ border: solid 1px;
+ border-color: rgba(0,0,0,0.2);
+ border-radius: 5px 0px 0px 5px;
+
+ text-align: left;
+}
+
+button:hover{
+ opacity: 0.5;
+ border:none;
+}

@@ -101,3 +101,33 @@ button:hover{
  opacity: 0.5;
  border:none;
 }
+
+
+.task{
+ height: 50%;
+ width: 50%;
+ text-align: center;
+ position: absolute;
+ //background-color: red;
+}
+
+
+.selection{
+ top: 50px;
+ left: 30%;
+ position: relative;
+
+ opacity: 0.8;
+
+}
+
+.anwser{
+
+ padding: 10px 20px;
+ margin: 20px;
+ background-color: gray;
+ border: none;
+ position: sticky;
+
+}
+

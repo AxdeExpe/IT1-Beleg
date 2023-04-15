@@ -34,37 +34,34 @@ class Presenter{
 }
 
 //---------------------View---------------------------------------------------------------------
-class View{
+class View {
     #p;
     #hidden;
-    constructor(p){
-       this.#p=p;
-       this.setHandler();
+
+    constructor(p) {
+        this.#p = p;
+        this.#hidden = false;
+        this.setHandler();
     }
 
-    setHandler(){
-        document.getElementById("sidebar").addEventListener("click", this.hideSidebar.bind(this));
-        document.getElementById("sidebar").addEventListener("click", this.showSidebar.bind(this));
-        this.#hidden = false;
+    setHandler() {
+        document.getElementById("sidebar").addEventListener("click", this.actSidebar.bind(this));
+        //document.getElementById("sidebar").addEventListener("click", this.showSidebar.bind(this));
         //document.querySelector("#sidebar > *").setAttribute("number", 0);
     }
 
-    evaluate(event){
+    evaluate(event) {
 
     }
 
-    showSidebar(){
+    actSidebar(event) {
+        if (event.target.nodeName.toLowerCase() === "button") {
 
-    }
-    
-    hideSidebar(event){
-        
-        if(this.#hidden === false) {
+            if (event.target.id === "handler") {
 
-            if (event.target.nodeName.toLowerCase() === "button") {
-                this.#hidden = true;
+                if (this.#hidden === false) {
+                    this.#hidden = true;
 
-                if (event.target.id === "handler") {
                     let sidebar = document.getElementById("sidebar");
                     sidebar.style.marginLeft = "-138px";
 
@@ -74,20 +71,24 @@ class View{
                     handler.style.backgroundColor = "gray";
                     handler.style.border = "none";
 
-                    console.log("hideHandler(): " + event.type + " Color: " + this.color);
+                    console.log("actSidebar(): is hidden!");
+                } else {
+                    this.#hidden = false;
+
+                    let sidebar = document.getElementById("sidebar");
+                    sidebar.style.marginLeft = "0px";
+
+                    let handler = document.getElementById("handler");
+                    handler.style.marginLeft = "0px";
+                    handler.style.backgroundColor = "rgba(0,0,0,0.1)";
+
+                    handler.style.removeProperty('border');
+                    handler.style.removeProperty('borderColor');
+                    handler.style.removeProperty('transform');
+                    
+                    console.log("actSidebar(): is shown!");
                 }
             }
-        }
-    }
-    
-    showSidebar(event){
-        
-        if(this.#hidden === true){
-            let sidebar = document.getElementById("sidebar");
-            sidebar.style.marginLeft = "138px";
-            
-            console.log("hallo");
-
         }
     }
 }

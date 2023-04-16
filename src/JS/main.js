@@ -63,11 +63,12 @@ class View {
                     this.#hidden = true;
 
                     let sidebar = document.getElementById("sidebar");
-                    sidebar.style.marginLeft = "-138px";
+                    sidebar.style.marginLeft = "-30vw";
 
                     let handler = document.getElementById("handler");
-                    handler.style.marginLeft = "16px";
+                    handler.style.marginLeft = "0px";
                     handler.style.transform = "scaleX(-1)";
+                    handler.style.borderRadius = "5px 0px 0px 5px";
                     handler.style.backgroundColor = "gray";
                     handler.style.border = "none";
 
@@ -79,10 +80,9 @@ class View {
                     sidebar.style.marginLeft = "0px";
 
                     let handler = document.getElementById("handler");
-                    handler.style.marginLeft = "0px";
+                    handler.style.marginLeft = "null";
                     handler.style.backgroundColor = "rgba(0,0,0,0.1)";
-
-                    handler.style.removeProperty('border');
+                    handler.style.borderRadius = "0px 5px 5px 0px";
                     handler.style.removeProperty('borderColor');
                     handler.style.removeProperty('transform');
                     

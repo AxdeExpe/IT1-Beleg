@@ -1,10 +1,10 @@
 body{
  font-family: arial;
- background-image: url(/Lernprogramm/src/CSS/BackgroundImage.jpg);
+ background-image: url(/Lernprogramm/src/Image/BackgroundImage.jpg);
  background-color: gray;
  background-repeat: no-repeat;
  background-position: center;
- height: 750px;
+ height: 100vh;
  background-size: cover;
  background-color: #4b4b4b;
 }
@@ -25,15 +25,16 @@ h2{
 }
 
 .sidebar {
- height: 100%;
- width: 100px;
+ height: 100vh;
+ width: 30vw;
  position: absolute;
  left: 0;
  top: 0;
  padding-top: 40px;
  background-color: gray;
- opacity: 0.7;
- width: fit-content;
+
+
+ z-index: 2;
 
  transition-property: background-color, font-size, transform, color, margin;
  transition-timing-function: ease-in-out;
@@ -73,7 +74,7 @@ h1{
  background-color: gray;
  opacity: 1;
  width: fit-content;
- margin-left: 120px;
+ margin-left: 30vw;
 
  transition-property: background-color, font-size, transform, color, margin;
  transition-timing-function: ease-in-out;
@@ -90,9 +91,8 @@ h1{
 
 
  background-color: rgba(0,0,0,0.1);
- border: solid 1px;
- border-color: rgba(0,0,0,0.2);
- border-radius: 5px 0px 0px 5px;
+ border: 1px solid rgba(0, 0, 0, 0.2);
+ border-radius: 0px 5px 5px 0px;
 
  text-align: left;
 }
@@ -104,24 +104,78 @@ button:hover{
 
 
 .task{
- height: 50%;
+ height:80vh;
  width: 50%;
+ min-width: 60%;
+ max-width: 100%;
+
  text-align: center;
- position: absolute;
- //background-color: red;
+ margin-left: auto;
+ margin-right: auto;
+ margin-top: 50px;
+ background-color: gray;
+ position: relative;
+ opacity: 0.8;
+ z-index: 1;
 }
 
-
-.selection{
- top: 50px;
- left: 30%;
+.question{
+ background-color: rgb(16, 16, 16);
+ border: 1px solid black;
  position: relative;
 
- opacity: 0.8;
+ width: 100%;
+ height: 100px;
 
+ max-width: 15000%;
+ min-width: fit-content;
+
+ min-height: 20px;
+ max-height: fit-content;
+
+ margin: 0px auto -10px;
+
+ color: white;
+ font-size: 30px;
+ text-align: center;
+ z-index: 2;
 }
 
-.anwser{
+.progressBar{
+ background-color: rgb(24, 95, 248);
+ min-width: fit-content;
+ max-width: 90%;
+ width: 100%; /*needs change in script*/
+ height: 20px;
+ position: relative;
+ margin-left: auto;
+ margin-right: auto;
+
+ border-radius: 4px;
+}
+
+.selection{
+ width: 90%;
+ height: 20%;
+ margin-right: auto;
+ margin-left: auto;
+ position: relative;
+ background-color: red;
+ padding-top: 50%;
+ padding-bottom: 50%;
+}
+
+.top{
+ margin-left: auto;
+ margin-right: auto;
+}
+
+.bottom{
+ margin-left: auto;
+ margin-right: auto;
+}
+
+.answer{
 
  padding: 10px 20px;
  margin: 20px;
@@ -129,5 +183,6 @@ button:hover{
  border: none;
  position: sticky;
 
-}
+ z-index: 3;
 
+}

@@ -46,6 +46,10 @@ class View {
 
     setHandler() {
         document.getElementById("sidebar").addEventListener("click", this.actSidebar.bind(this));
+        document.getElementById("Mathe").addEventListener("click", this.);
+        document.getElementById("Allgemeines").addEventListener("click", this.);
+        document.getElementById("IT").addEventListener("click", this.);
+
         //document.getElementById("sidebar").addEventListener("click", this.showSidebar.bind(this));
         //document.querySelector("#sidebar > *").setAttribute("number", 0);
     }

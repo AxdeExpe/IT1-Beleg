@@ -81,7 +81,7 @@ class View {
 
                     let handler = document.getElementById("handler");
                     handler.style.marginLeft = "null";
-                    handler.style.backgroundColor = "rgba(0,0,0,0.1)";
+                    handler.style.backgroundColor = "gray";
                     handler.style.borderRadius = "0px 5px 5px 0px";
                     handler.style.removeProperty('borderColor');
                     handler.style.removeProperty('transform');

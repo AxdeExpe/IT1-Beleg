@@ -27,6 +27,7 @@ h2{
 .sidebar {
  height: 100vh;
  width: 30vw;
+
  position: absolute;
  left: 0;
  top: 0;
@@ -59,10 +60,18 @@ h1{
  font-size: 20px;
  text-align: center;
  margin-top: 30px;
+ margin-right: auto;
+ margin-left: auto;
  border-radius: 5px;
  border: solid black 1px;
  background-color: rgba(0,0,0,0.3);
  display: block;
+ width: 30vw;
+}
+
+a{
+ text-decoration: none;
+ color: white;
 }
 
 
@@ -163,15 +172,14 @@ button:hover{
 .selection{
  width: auto;
  max-width: 90%;
-
  height:auto;
- min-height: 100%;
-
-
+ max-height: 100%;
 
  position: relative;
  /*background-color: red;*/
- margin:auto;
+ margin-top: 10%;
+ margin-left: auto;
+ margin-right: auto;
 
  overflow: hidden;
 }
@@ -179,30 +187,34 @@ button:hover{
 .top{
  margin-left: auto;
  margin-right: auto;
-
- margin-top: 50%;
 }
 
 .bottom{
+ margin-top: 10%;
  margin-left: auto;
  margin-right: auto;
-
 }
 
 .answer{
  background-color: black;
  color: white;
  border-radius: 4px;
-
  font-size: 20px;
 
- width: 12vw;
- height: 6vh;
+ /*ändern*/
+ text-overflow: ellipsis;
+ overflow: hidden;
+ white-space: nowrap;
 
- margin: 20px;
+ min-width: 15vw;
+
+ width: 20vw;
+
+ height: 8vh;
+
+ margin: 30px;
  border: none;
  position: sticky;
 
  z-index: 3;
-
 }

@@ -10,62 +10,151 @@ document.addEventListener('DOMContentLoaded', function (){
 
 //---------------------Model--------------------------------------------------------------------
 class Model{
+    constructor(){
 
-    getTask(){
+    }
+
+      getTask(event, topic){
+
+
         return "1";
     }
 
 }
 
+
 //---------------------Presenter----------------------------------------------------------------
 class Presenter{
-    #v;
+    //Objects
     #m;
+    #v;
+
+    //Var's
+    #File;
+
+    start(){
+       // let a = this.#m.getTask();
+    }
+
     setModelAndView(m, v){
         this.#m = m;
         this.#v = v;
     }
 
-    start(){
-        //let a = this.#m.getTask();
-        //document.getElementById("handler");
+//---------------------------------Task---------------------------------
+
+    loadTask(event){
+        let topic = event.target.id;
+
+        if(topic === "Mathe"){
+            console.log("Topic: " + topic);
+            this.#m.getTask(event, topic);
+        }
+        else if(topic === "IT 1"){
+            console.log("Topic: " + topic);
+            this.#m.getTask(event, topic);
+        }
+        else if(topic === "Allgemeines"){
+            console.log("Topic: " + topic);
+            this.#m.getTask(event, topic);
+        }
+        else{
+            console.log("Topic is undefined!");
+        }
+
+
     }
 
+//--------------------------------Answer--------------------------------
+    buttonAction(event){
+
+        let id = event.target.id;
+
+        switch(id) {
+            case "A":
+                console.log("A pushed");
+                Presenter.checkAnswer(event);
+                break;
+            case "B":
+                console.log("B pushed");
+                Presenter.checkAnswer(event);
+                break;
+            case "C":
+                console.log("C pushed");
+                Presenter.checkAnswer(event);
+                break;
+            case "D":
+                console.log("D pushed");
+                Presenter.checkAnswer.bind(event);
+                break;
+            default:
+                console.log("Wrong ID!");
+                break;
+        }
+    }
+
+    static checkAnswer(event){
+        let topic = document.getElementById("topic").innerHTML;
+        if(topic === "Mathe"){
+            this.#File = "../JSON/Mathe.json";
+        }
+        if(topic === "IT 1"){
+            this.#File = "../JSON/IT.json";
+
+        }
+        if(topic === "Allgemeines"){
+            this.File = "../JSON/Allgemeines.json";
+        }
+    }
 }
 
 //---------------------View---------------------------------------------------------------------
 class View {
+    //Objects
     #p;
-    #hidden;
+    #hidden = false;
 
     constructor(p) {
         this.#p = p;
-        this.#hidden = false;
         this.setHandler();
     }
 
     setHandler() {
-        document.getElementById("sidebar").addEventListener("click", this.actSidebar.bind(this));
-        document.getElementById("Mathe").addEventListener("click", this.);
-        document.getElementById("Allgemeines").addEventListener("click", this.);
-        document.getElementById("IT").addEventListener("click", this.);
 
-        //document.getElementById("sidebar").addEventListener("click", this.showSidebar.bind(this));
-        //document.querySelector("#sidebar > *").setAttribute("number", 0);
+        //control button
+        document.getElementById("sidebar").addEventListener("click", this.actSidebar.bind(this));
+
+        //topic button
+        document.getElementById("Mathe").addEventListener("click", this.callLoadTask.bind(this));
+        document.getElementById("IT 1").addEventListener("click", this.callLoadTask.bind(this));
+        document.getElementById("Allgemeines").addEventListener("click", this.callLoadTask.bind(this));
+
+        //answer button
+        
+        if(document.getElementById("topic").innerHTML !== "IT1 - Beleg"){
+            document.getElementById("A").addEventListener("click", this.callButtonAction.bind(this));
+            document.getElementById("B").addEventListener("click", this.callButtonAction.bind(this));
+            document.getElementById("C").addEventListener("click", this.callButtonAction.bind(this));
+            document.getElementById("D").addEventListener("click", this.callButtonAction.bind(this));
+        }
     }
 
-    evaluate(event) {
+    callButtonAction(event){
+        this.#p.buttonAction(event);
+    }
 
+    callLoadTask(event){
+        this.#p.loadTask(event);
     }
 
     actSidebar(event) {
+
         if (event.target.nodeName.toLowerCase() === "button") {
 
             if (event.target.id === "handler") {
 
                 if (this.#hidden === false) {
                     this.#hidden = true;
-
                     let sidebar = document.getElementById("sidebar");
                     sidebar.style.marginLeft = "-30vw";
 
@@ -76,10 +165,10 @@ class View {
                     handler.style.backgroundColor = "gray";
                     handler.style.border = "none";
 
-                    console.log("actSidebar(): is hidden!");
-                } else {
+                    console.log("Sidebar is hidden!");
+                }
+                else {
                     this.#hidden = false;
-
                     let sidebar = document.getElementById("sidebar");
                     sidebar.style.marginLeft = "0px";
 
@@ -89,8 +178,8 @@ class View {
                     handler.style.borderRadius = "0px 5px 5px 0px";
                     handler.style.removeProperty('borderColor');
                     handler.style.removeProperty('transform');
-                    
-                    console.log("actSidebar(): is shown!");
+
+                    console.log("Sidebar is shown!");
                 }
             }
         }

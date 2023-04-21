@@ -1,4 +1,10 @@
 "use strict"
+import loadMathe from './loadMathe.js';
+import loadAllgemeines from './loadAllgemeines.js';
+import loadIT1 from './loadIT1.js';
+
+
+
 document.addEventListener('DOMContentLoaded', function (){
     let m, p, v;
     m = new Model();
@@ -6,16 +12,36 @@ document.addEventListener('DOMContentLoaded', function (){
     v = new View(p);
     p.setModelAndView(m,v);
     p.start();
+
+    const a = loadAllgemeines();
+    const b = loadMathe();
+    const c = loadIT1();
+
+    console.log(a);
+    console.log(b);
+    console.log(c);
+
 })
 
 //---------------------Model--------------------------------------------------------------------
 class Model{
+    //Var's
+    #File
+
+
     constructor(){
 
     }
 
-      getTask(event, topic){
+     loadTask(topic) {
+        this.#File = "../JSON/" + topic + ".json";
 
+        console.log(this.#File);
+
+    }
+
+
+    getTask(event, topic){
 
         return "1";
     }
@@ -43,20 +69,23 @@ class Presenter{
 
 //---------------------------------Task---------------------------------
 
-    loadTask(event){
+    Task(event){
         let topic = event.target.id;
 
         if(topic === "Mathe"){
             console.log("Topic: " + topic);
+            this.#m.loadTask(topic);
             this.#m.getTask(event, topic);
         }
         else if(topic === "IT 1"){
             console.log("Topic: " + topic);
+            this.#m.loadTask(topic);
             this.#m.getTask(event, topic);
         }
         else if(topic === "Allgemeines"){
             console.log("Topic: " + topic);
-            this.#m.getTask(event, topic);
+            this.#m.loadTask(topic);
+            //this.#m.getTask(event, topic);
         }
         else{
             console.log("Topic is undefined!");
@@ -103,7 +132,7 @@ class Presenter{
 
         }
         if(topic === "Allgemeines"){
-            this.File = "../JSON/Allgemeines.json";
+            this.#File = "../JSON/Allgemeines.json";
         }
     }
 }
@@ -125,9 +154,9 @@ class View {
         document.getElementById("sidebar").addEventListener("click", this.actSidebar.bind(this));
 
         //topic button
-        document.getElementById("Mathe").addEventListener("click", this.callLoadTask.bind(this));
-        document.getElementById("IT 1").addEventListener("click", this.callLoadTask.bind(this));
-        document.getElementById("Allgemeines").addEventListener("click", this.callLoadTask.bind(this));
+        document.getElementById("Mathe").addEventListener("click", this.callTask.bind(this));
+        document.getElementById("IT 1").addEventListener("click", this.callTask.bind(this));
+        document.getElementById("Allgemeines").addEventListener("click", this.callTask.bind(this));
 
         //answer button
         
@@ -143,8 +172,8 @@ class View {
         this.#p.buttonAction(event);
     }
 
-    callLoadTask(event){
-        this.#p.loadTask(event);
+    callTask(event){
+        this.#p.Task(event);
     }
 
     actSidebar(event) {

@@ -1,51 +1,186 @@
 "use strict"
-import loadMathe from './loadMathe.js';
-import loadAllgemeines from './loadAllgemeines.js';
-import loadIT1 from './loadIT1.js';
-
-
+//import loadFile from './loadFile.js';
 
 document.addEventListener('DOMContentLoaded', function (){
     let m, p, v;
     m = new Model();
+
     p = new Presenter();
     v = new View(p);
     p.setModelAndView(m,v);
     p.start();
 
-    const a = loadAllgemeines();
-    const b = loadMathe();
-    const c = loadIT1();
-
-    console.log(a);
-    console.log(b);
-    console.log(c);
-
 })
 
 //---------------------Model--------------------------------------------------------------------
-class Model{
+class Model {
     //Var's
-    #File
+    #FileLength = 10; //Anzahl Aufgaben
+    #FileWidth = 4; //Anzahl Lösungen pro Aufgabe
 
 
-    constructor(){
+    #AllgemeinesLösung = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth));
+    #MatheLösung = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth));
+    #IT1Lösung = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth));
+
+    #AllgemeinesAufgaben = [this.#FileLength];
+    #MatheAufgaben = [this.#FileLength];
+    #IT1Aufgaben = [this.#FileLength];
+
+    constructor() {
+        // this.loadFile("Allgemeines");
+
+        this.loadMathe();
+        this.loadAllgemeines();
+        this.loadIT1();
 
     }
 
-     loadTask(topic) {
-        this.#File = "../JSON/" + topic + ".json";
 
-        console.log(this.#File);
+    loadMathe() {
+        fetch("../JSON/Mathe.json")
+            .then(response => response.json())
+            .then(data => {
+               // console.log("Mathe");
 
+                for (let i = 0; i < this.#FileLength; i++) {
+
+                    //Aufgaben
+                    this.#MatheAufgaben[i] = data.Mathe[i].a;
+                  //  console.log("Task: " + this.#MatheAufgaben[i]);
+
+                    for (let j = 0; j < this.#FileWidth; j++) {
+
+                        //Lösungen
+                        this.#MatheLösung[i][j] = data.Mathe[i].l[j];
+                    }
+                }
+            });
+    }
+
+    loadAllgemeines() {
+        fetch("../JSON/Allgemeines.json")
+            .then(response => response.json())
+            .then(data => {
+               // console.log("Allgemeines");
+
+                for (let i = 0; i < this.#FileLength; i++) {
+
+                    //Aufgaben
+                    this.#AllgemeinesAufgaben[i] = data.Allgemeines[i].a;
+                   // console.log("Task: " + this.#AllgemeinesAufgaben[i]);
+
+                    for (let j = 0; j < this.#FileWidth; j++) {
+
+                        //Lösungen
+                        this.#AllgemeinesLösung[i][j] = data.Allgemeines[i].l[j];
+                    }
+                }
+            });
+    }
+
+    loadIT1() {
+        fetch("../JSON/IT 1.json")
+            .then(response => response.json())
+            .then(data => {
+               // console.log("IT1");
+
+                for (let i = 0; i < this.#FileLength; i++) {
+
+                    //Aufagben
+                    this.#IT1Aufgaben[i] = data.IT1[i].a;
+                   // console.log("Task: " + this.#IT1Aufgaben[i]);
+
+                    for (let j = 0; j < this.#FileWidth; j++) {
+
+                        //Lösungen
+                        this.#IT1Lösung[i][j] = data.IT1[i].l[j];
+                    }
+                }
+            });
     }
 
 
-    getTask(event, topic){
 
-        return "1";
+    //question = [Aufgabe 1, Antwort 1, Antwort 2, Antwort 3, Antwort 4, Aufgabe 2, Antwort 1, Antwort 2, Antwort 3, Antwort 4, ...]
+    //Anzahl = 5, Verhältnis = 1 : 5, ==> Counter = 5
+
+    #questionBuffer = [];
+    #questionBufferCount = 0;
+    #question = [this.#FileWidth+1];
+
+    randomizer(){
+        return Math.floor(Math.random() * 10);
     }
 
+    taskRandomizer(){
+        let task = this.randomizer();
+        this.#question[0] = this.#MatheAufgaben[task];
+
+        this.#questionBufferCount++;
+        this.#questionBuffer[this.#questionBufferCount] = task;
+
+        for(let i = 0; i < this.#questionBufferCount; i++){
+
+            if(task === this.#questionBuffer[i]){
+
+            }
+        }
+
+        for(let i = 1; i < this.#FileWidth; i++){
+            let answer = Math.floor(Math.random() * 5);
+            buffer[]
+
+            if(answer){
+
+            }
+
+            question[i] = this.#MatheLösung[task][answer];
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+    getMatheTask() {
+        for (let i = 0; i < this.#FileLength; i++) {
+
+            console.log("Aufgabe: " + this.#MatheAufgaben[i]);
+
+            for (let j = 0; j < this.#FileWidth; j++) {
+                console.log("Lösungen: " + this.#MatheLösung[i][j]);
+            }
+        }
+    }
+
+    getAllgemeinesTask(i) {
+        for (let i = 0; i < this.#FileLength; i++) {
+
+            console.log("Aufgabe: " + this.#AllgemeinesAufgaben[i]);
+            array[i] = this.#AllgemeinesAufgaben[i];
+
+            for (let j = 0; j < this.#FileWidth; j++) {
+                console.log("Lösungen: " + this.#AllgemeinesLösung[i][j]);
+            }
+        }
+    }
+
+    getIT1Task() {
+        for (let i = 0; i < this.#FileLength; i++) {
+
+            console.log("Aufgabe: " + this.#IT1Aufgaben[i]);
+
+            for (let j = 0; j < this.#FileWidth; j++) {
+                console.log("Lösungen: " + this.#IT1Lösung[i][j]);
+            }
+        }
+    }
 }
 
 
@@ -74,18 +209,15 @@ class Presenter{
 
         if(topic === "Mathe"){
             console.log("Topic: " + topic);
-            this.#m.loadTask(topic);
-            this.#m.getTask(event, topic);
+            this.#m.getMatheTask();
         }
         else if(topic === "IT 1"){
             console.log("Topic: " + topic);
-            this.#m.loadTask(topic);
-            this.#m.getTask(event, topic);
+            this.#m.getIT1Task();
         }
         else if(topic === "Allgemeines"){
             console.log("Topic: " + topic);
-            this.#m.loadTask(topic);
-            //this.#m.getTask(event, topic);
+            this.#m.getAllgemeinesTask();
         }
         else{
             console.log("Topic is undefined!");

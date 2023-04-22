@@ -8,7 +8,7 @@
     {"a":"Wozu HTML", "l":["Grundgerüst","Styling","Logik","Datenbank API"]},
     {"a":"Gute JavaScript Alternativen", "l":["Typescript","HTML","CSS","Pascal"]},
     {"a":"Wesentlicher Unterschied HTTP und HTTPS", "l":["HTTPS ist verschlüsselt","HTTP ist schneller","2-Faktor-Authentifizierung","Gibt keinen"]},
-    {"a":"Verschlüsselung für HTTPS", "l":["TLS/SSL","Elliptische Kurve","RSA","AES"]},
+    {"a":"Verschlüsselung von HTTPS", "l":["TLS/SSL","Elliptische Kurve","RSA","AES"]},
     {"a":"Was ist DynDNS ", "l":["Domain für dynamische IP","Verschlüsselung","Das gleiche wie DNS","Ein Socket"]}
   ]
 }

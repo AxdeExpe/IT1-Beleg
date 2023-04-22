@@ -19,9 +19,9 @@ class Model {
     #FileWidth = 4; //Anzahl Lösungen pro Aufgabe
 
 
-    #AllgemeinesLösung = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth));
-    #MatheLösung = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth));
-    #IT1Lösung = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth));
+    #Allgemeines = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
+    #Mathe = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
+    #IT1 = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
 
     #AllgemeinesAufgaben = [this.#FileLength];
     #MatheAufgaben = [this.#FileLength];
@@ -46,13 +46,14 @@ class Model {
                 for (let i = 0; i < this.#FileLength; i++) {
 
                     //Aufgaben
-                    this.#MatheAufgaben[i] = data.Mathe[i].a;
-                  //  console.log("Task: " + this.#MatheAufgaben[i]);
+                    this.#Mathe[i][0] = data.Mathe[i].a;
+                    console.log("Aufgabe: " + this.#Mathe[i][0]);
 
-                    for (let j = 0; j < this.#FileWidth; j++) {
+                    for (let j = 1; j <= this.#FileWidth; j++) {
 
                         //Lösungen
-                        this.#MatheLösung[i][j] = data.Mathe[i].l[j];
+                        this.#Mathe[i][j] = data.Mathe[i].l[j-1];
+                        console.log("Antwort: " + this.#Mathe[i][j]);
                     }
                 }
             });
@@ -67,13 +68,14 @@ class Model {
                 for (let i = 0; i < this.#FileLength; i++) {
 
                     //Aufgaben
-                    this.#AllgemeinesAufgaben[i] = data.Allgemeines[i].a;
-                   // console.log("Task: " + this.#AllgemeinesAufgaben[i]);
+                    this.#Allgemeines[i][0] = data.Allgemeines[i].a;
+                    console.log("Aufgabe: " + this.#Allgemeines[i]);
 
-                    for (let j = 0; j < this.#FileWidth; j++) {
+                    for (let j = 1; j <= this.#FileWidth; j++) {
 
                         //Lösungen
-                        this.#AllgemeinesLösung[i][j] = data.Allgemeines[i].l[j];
+                        this.#Allgemeines[i][j] = data.Allgemeines[i].l[j-1];
+                        console.log("Antwort: " + this.#Allgemeines[i][j]);
                     }
                 }
             });
@@ -88,13 +90,14 @@ class Model {
                 for (let i = 0; i < this.#FileLength; i++) {
 
                     //Aufagben
-                    this.#IT1Aufgaben[i] = data.IT1[i].a;
-                   // console.log("Task: " + this.#IT1Aufgaben[i]);
+                    this.#IT1[i][0] = data.IT1[i].a;
+                    console.log("Aufgaben: " + this.#IT1[i]);
 
-                    for (let j = 0; j < this.#FileWidth; j++) {
+                    for (let j = 1; j <= this.#FileWidth; j++) {
 
                         //Lösungen
-                        this.#IT1Lösung[i][j] = data.IT1[i].l[j];
+                        this.#IT1[i][j] = data.IT1[i].l[j-1];
+                        console.log("Antwort: " + this.#IT1[i][j]);
                     }
                 }
             });
@@ -104,39 +107,74 @@ class Model {
 
     //question = [Aufgabe 1, Antwort 1, Antwort 2, Antwort 3, Antwort 4, Aufgabe 2, Antwort 1, Antwort 2, Antwort 3, Antwort 4, ...]
     //Anzahl = 5, Verhältnis = 1 : 5, ==> Counter = 5
+    #groupOfTasks;
+    #task = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
+    #rightAnwser = [];
 
     #questionBuffer = [];
     #questionBufferCount = 0;
-    #question = [this.#FileWidth+1];
 
-    randomizer(){
-        return Math.floor(Math.random() * 10);
+    #answerBuffer = [];
+    #answerBufferCount = [];
+
+
+    checkAwnser(answer){
+        for(let j = 0; j<this.#task.length; j++) {
+            if (answer === this.#answerBuffer[j]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    checkQuestion(question){
+        for(let j = 0; j<this.#FileLength; j++) {
+            if (question === this.#questionBuffer[j]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     taskRandomizer(){
-        let task = this.randomizer();
-        this.#question[0] = this.#MatheAufgaben[task];
 
+        let answer, checkAwnser, question, checkQuestion;
+        question = Math.floor(Math.random() * 10);
+
+        this.#task[this.#questionBufferCount][0] = this.#Mathe[question][0];
+        //this.#questionBuffer[this.#questionBufferCount] = question;
         this.#questionBufferCount++;
-        this.#questionBuffer[this.#questionBufferCount] = task;
 
-        for(let i = 0; i < this.#questionBufferCount; i++){
+        this.#rightAnwser[this.#answerBufferCount] = this.#Mathe[question][1];
+        this.#answerBufferCount++;
 
-            if(task === this.#questionBuffer[i]){
+        //randomize answer per question
+        for(let i = 1; i <= this.#FileWidth; i++){
+            answer = Math.floor(Math.random() * 5);
+            this.#answerBuffer[i-1] = answer;
 
-            }
-        }
-
-        for(let i = 1; i < this.#FileWidth; i++){
-            let answer = Math.floor(Math.random() * 5);
-            buffer[]
-
-            if(answer){
-
+            checkAwnser = this.checkAwnser(answer);
+            while(checkAwnser === false) {
+                answer = Math.floor(Math.random() * 5);
+                checkAwnser = this.checkAwnser(answer);
             }
 
-            question[i] = this.#MatheLösung[task][answer];
+            this.#task[this.#questionBufferCount][i] = this.#Mathe[question][answer];
         }
+
+        //randomize questions
+        for(let i = 1; i <= this.#FileLength; i++){
+            question = Math.floor(Math.random() * 10);
+            this.#questionBuffer[i-1] = question;
+
+            checkQuestion = this.checkQuestion(question);
+            while(checkQuestion === false){
+                question = Math.floor(Math.random() * 10);
+                checkQuestion = this.checkQuestion(question);
+            }
+            this.#task[this.#questionBufferCount][]
+        }
+
     }
 
 
@@ -151,10 +189,10 @@ class Model {
     getMatheTask() {
         for (let i = 0; i < this.#FileLength; i++) {
 
-            console.log("Aufgabe: " + this.#MatheAufgaben[i]);
+            console.log("Aufgabe: " + this.#Mathe[i][0]);
 
-            for (let j = 0; j < this.#FileWidth; j++) {
-                console.log("Lösungen: " + this.#MatheLösung[i][j]);
+            for (let j = 1; j <= this.#FileWidth; j++) {
+                console.log("Lösungen: " + this.#Mathe[i][j]);
             }
         }
     }
@@ -162,11 +200,10 @@ class Model {
     getAllgemeinesTask(i) {
         for (let i = 0; i < this.#FileLength; i++) {
 
-            console.log("Aufgabe: " + this.#AllgemeinesAufgaben[i]);
-            array[i] = this.#AllgemeinesAufgaben[i];
+            console.log("Aufgabe: " + this.#Allgemeines[i][0]);
 
-            for (let j = 0; j < this.#FileWidth; j++) {
-                console.log("Lösungen: " + this.#AllgemeinesLösung[i][j]);
+            for (let j = 1; j <= this.#FileWidth; j++) {
+                console.log("Lösungen: " + this.#Allgemeines[i][j]);
             }
         }
     }
@@ -174,10 +211,10 @@ class Model {
     getIT1Task() {
         for (let i = 0; i < this.#FileLength; i++) {
 
-            console.log("Aufgabe: " + this.#IT1Aufgaben[i]);
+            console.log("Lösungen: " + this.#IT1[i][0]);
 
-            for (let j = 0; j < this.#FileWidth; j++) {
-                console.log("Lösungen: " + this.#IT1Lösung[i][j]);
+            for (let j = 1; j <= this.#FileWidth; j++) {
+                console.log("Lösungen: " + this.#IT1[i][j]);
             }
         }
     }

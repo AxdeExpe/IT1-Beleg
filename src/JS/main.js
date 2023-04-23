@@ -24,15 +24,12 @@ class Model {
     #IT1 = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
 
     constructor() {
-        // this.loadFile("Allgemeines");
-
         this.loadMathe();
         this.loadAllgemeines();
         this.loadIT1();
-
     }
 
-
+//-------------------------------LoadFiles--------------------------------
     loadMathe() {
         fetch("../JSON/Mathe.json")
             .then(response => response.json())
@@ -43,13 +40,13 @@ class Model {
 
                     //Aufgaben
                     this.#Mathe[i][0] = data.Mathe[i].a;
-                    console.log("Aufgabe: " + this.#Mathe[i][0]);
+                    //console.log("Aufgabe: " + this.#Mathe[i][0]);
 
                     for (let j = 1; j <= this.#FileWidth; j++) {
 
                         //Lösungen
                         this.#Mathe[i][j] = data.Mathe[i].l[j-1];
-                        console.log("Antwort: " + this.#Mathe[i][j]);
+                        //console.log("Antwort: " + this.#Mathe[i][j]);
                     }
                 }
             });
@@ -65,13 +62,13 @@ class Model {
 
                     //Aufgaben
                     this.#Allgemeines[i][0] = data.Allgemeines[i].a;
-                    console.log("Aufgabe: " + this.#Allgemeines[i]);
+                    //console.log("Aufgabe: " + this.#Allgemeines[i]);
 
                     for (let j = 1; j <= this.#FileWidth; j++) {
 
                         //Lösungen
                         this.#Allgemeines[i][j] = data.Allgemeines[i].l[j-1];
-                        console.log("Antwort: " + this.#Allgemeines[i][j]);
+                       //console.log("Antwort: " + this.#Allgemeines[i][j]);
                     }
                 }
             });
@@ -87,22 +84,22 @@ class Model {
 
                     //Aufagben
                     this.#IT1[i][0] = data.IT1[i].a;
-                    console.log("Aufgaben: " + this.#IT1[i]);
+                    //console.log("Aufgaben: " + this.#IT1[i]);
 
                     for (let j = 1; j <= this.#FileWidth; j++) {
 
                         //Lösungen
                         this.#IT1[i][j] = data.IT1[i].l[j-1];
-                        console.log("Antwort: " + this.#IT1[i][j]);
+                        //console.log("Antwort: " + this.#IT1[i][j]);
                     }
                 }
             });
     }
 
-
+//------------------------------Randomizing-------------------------------
 
     //question = [Aufgabe 1, Antwort 1, Antwort 2, Antwort 3, Antwort 4, Aufgabe 2, Antwort 1, Antwort 2, Antwort 3, Antwort 4, ...]
-    //Anzahl = 5, Verhältnis = 1 : 5, ==> Counter = 5
+    //Anzahl = 5, Verhältnis = 1 : 5
     taskRandomizer(questions){
 
         const shuffledQuestions = questions.slice();
@@ -131,66 +128,15 @@ class Model {
 
 
     getMatheTask() {
-        for (let i = 0; i < this.#FileLength; i++) {
-
-            console.log("Aufgabe: " + this.#Mathe[i][0]);
-
-            for (let j = 1; j <= this.#FileWidth; j++) {
-                console.log("Lösungen: " + this.#Mathe[i][j]);
-            }
-        }
-        const { shuffledQuestions, rightAnswers } = this.taskRandomizer(this.#Mathe);
-        console.log("________________RANDOM__________________");
-
-        let j = 0;
-        for(let i = 0; i< shuffledQuestions.length; i++){
-            console.log(shuffledQuestions[i]);
-            console.log(rightAnswers[j]);
-            j++
-        }
-
+        return this.taskRandomizer(this.#Mathe);
     }
 
     getAllgemeinesTask(i) {
-        for (let i = 0; i < this.#FileLength; i++) {
-
-            console.log("Aufgabe: " + this.#Allgemeines[i][0]);
-
-            for (let j = 1; j <= this.#FileWidth; j++) {
-                console.log("Lösungen: " + this.#Allgemeines[i][j]);
-            }
-        }
-
-        const { shuffledQuestions, rightAnswers } = this.taskRandomizer(this.#Allgemeines);
-        console.log("________________RANDOM__________________");
-
-        let j = 0;
-        for(let i = 0; i< shuffledQuestions.length; i++){
-            console.log(shuffledQuestions[i]);
-            console.log(rightAnswers[j]);
-            j++
-        }
+        return this.taskRandomizer(this.#Allgemeines);
     }
 
     getIT1Task() {
-        for (let i = 0; i < this.#FileLength; i++) {
-
-            console.log("Lösungen: " + this.#IT1[i][0]);
-
-            for (let j = 1; j <= this.#FileWidth; j++) {
-                console.log("Lösungen: " + this.#IT1[i][j]);
-            }
-        }
-
-        const { shuffledQuestions, rightAnswers } = this.taskRandomizer(this.#IT1);
-        console.log("________________RANDOM__________________");
-
-        let j = 0;
-        for(let i = 0; i< shuffledQuestions.length; i++){
-            console.log(shuffledQuestions[i]);
-            console.log(rightAnswers[j]);
-            j++
-        }
+        return this.taskRandomizer(this.#IT1);
     }
 }
 
@@ -214,30 +160,54 @@ class Presenter{
     }
 
 //---------------------------------Task---------------------------------
+    #rightAnswers
+    #shuffledQuestions
 
     Task(event){
         let topic = event.target.id;
 
         if(topic === "Mathe"){
-            console.log("Topic: " + topic);
-            this.#m.getMatheTask();
+                const {shuffledQuestions, rigthAnswers} = this.#m.getMatheTask();
+                this.#shuffledQuestions = shuffledQuestions;
+                this.#rightAnswers = rigthAnswers;
+
+                return {shuffledQuestions, rigthAnswers};
+
         }
         else if(topic === "IT 1"){
             console.log("Topic: " + topic);
-            this.#m.getIT1Task();
+            const {shuffledQuestions, rightAnswers} = this.#m.getIT1Task();
+            this.#shuffledQuestions = shuffledQuestions;
+            this.#rightAnswers = rightAnswers;
         }
         else if(topic === "Allgemeines"){
             console.log("Topic: " + topic);
-            this.#m.getAllgemeinesTask();
+            const {shuffledQuestions, rightAnswers} = this.#m.getAllgemeinesTask();
+            this.#shuffledQuestions = shuffledQuestions;
+            this.#rightAnswers = rightAnswers;
         }
         else{
             console.log("Topic is undefined!");
         }
-
-
     }
 
 //--------------------------------Answer--------------------------------
+    static checkAnswer(event){
+        let topic = document.getElementById("topic").innerHTML;
+        console.log(topic);
+        if(topic === "Mathe"){
+
+        }
+        if(topic === "IT 1"){
+
+
+        }
+        if(topic === "Allgemeines"){
+
+        }
+    }
+
+
     buttonAction(event){
 
         let id = event.target.id;
@@ -245,37 +215,23 @@ class Presenter{
         switch(id) {
             case "A":
                 console.log("A pushed");
-                Presenter.checkAnswer(event);
+                this.checkAnswer(event);
                 break;
             case "B":
                 console.log("B pushed");
-                Presenter.checkAnswer(event);
+                this.checkAnswer(event);
                 break;
             case "C":
                 console.log("C pushed");
-                Presenter.checkAnswer(event);
+                this.checkAnswer(event);
                 break;
             case "D":
                 console.log("D pushed");
-                Presenter.checkAnswer.bind(event);
+                this.checkAnswer(event);
                 break;
             default:
                 console.log("Wrong ID!");
                 break;
-        }
-    }
-
-    static checkAnswer(event){
-        let topic = document.getElementById("topic").innerHTML;
-        if(topic === "Mathe"){
-            this.#File = "../JSON/Mathe.json";
-        }
-        if(topic === "IT 1"){
-            this.#File = "../JSON/IT.json";
-
-        }
-        if(topic === "Allgemeines"){
-            this.#File = "../JSON/Allgemeines.json";
         }
     }
 }
@@ -316,7 +272,8 @@ class View {
     }
 
     callTask(event){
-        this.#p.Task(event);
+        const {shuffledQuestions, rightAnswers} = this.#p.Task(event);
+        document.getElementById("question").textContent = shuffledQuestions[0][0];
     }
 
     actSidebar(event) {

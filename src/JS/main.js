@@ -23,10 +23,6 @@ class Model {
     #Mathe = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
     #IT1 = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
 
-    #AllgemeinesAufgaben = [this.#FileLength];
-    #MatheAufgaben = [this.#FileLength];
-    #IT1Aufgaben = [this.#FileLength];
-
     constructor() {
         // this.loadFile("Allgemeines");
 
@@ -107,83 +103,31 @@ class Model {
 
     //question = [Aufgabe 1, Antwort 1, Antwort 2, Antwort 3, Antwort 4, Aufgabe 2, Antwort 1, Antwort 2, Antwort 3, Antwort 4, ...]
     //Anzahl = 5, Verhältnis = 1 : 5, ==> Counter = 5
-    #groupOfTasks;
-    #task = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
-    #rightAnwser = [];
+    taskRandomizer(questions){
 
-    #questionBuffer = [];
-    #questionBufferCount = 0;
+        const shuffledQuestions = questions.slice();
+        const rightAnswers = [];
 
-    #answerBuffer = [];
-    #answerBufferCount = [];
-
-
-    checkAwnser(answer){
-        for(let j = 0; j<this.#task.length; j++) {
-            if (answer === this.#answerBuffer[j]) {
-                return false;
-            }
+        // Mische die Aufgaben zufällig
+        for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledQuestions[i], shuffledQuestions[j]] = [shuffledQuestions[j], shuffledQuestions[i]];
         }
-        return true;
+
+        // Mische die Antworten zu jeder Aufgabe zufällig
+        for (let i = 0; i < shuffledQuestions.length; i++) {
+            const answers = shuffledQuestions[i].slice(1); // Kopiere die Antworten, um das ursprüngliche Array nicht zu ändern
+            const rightAnswer = answers[0]; // Die richtige Antwort ist immer an der ersten Stelle
+            for (let j = answers.length - 1; j > 0; j--) {
+                const k = Math.floor(Math.random() * (j + 1));
+                [answers[j], answers[k]] = [answers[k], answers[j]]; // Mische die Antworten zufällig
+            }
+            shuffledQuestions[i] = [shuffledQuestions[i][0], ...answers]; // Setze die Antworten in die aufgemischte Frage ein
+            rightAnswers.push(rightAnswer); // Füge die richtige Antwort zum rightAnswers-Array hinzu
+        }
+
+        return { shuffledQuestions, rightAnswers };
     }
-
-    checkQuestion(question){
-        for(let j = 0; j<this.#FileLength; j++) {
-            if (question === this.#questionBuffer[j]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    taskRandomizer(){
-
-        let answer, checkAwnser, question, checkQuestion;
-        question = Math.floor(Math.random() * 10);
-
-        this.#task[this.#questionBufferCount][0] = this.#Mathe[question][0];
-        //this.#questionBuffer[this.#questionBufferCount] = question;
-        this.#questionBufferCount++;
-
-        this.#rightAnwser[this.#answerBufferCount] = this.#Mathe[question][1];
-        this.#answerBufferCount++;
-
-        //randomize answer per question
-        for(let i = 1; i <= this.#FileWidth; i++){
-            answer = Math.floor(Math.random() * 5);
-            this.#answerBuffer[i-1] = answer;
-
-            checkAwnser = this.checkAwnser(answer);
-            while(checkAwnser === false) {
-                answer = Math.floor(Math.random() * 5);
-                checkAwnser = this.checkAwnser(answer);
-            }
-
-            this.#task[this.#questionBufferCount][i] = this.#Mathe[question][answer];
-        }
-
-        //randomize questions
-        for(let i = 1; i <= this.#FileLength; i++){
-            question = Math.floor(Math.random() * 10);
-            this.#questionBuffer[i-1] = question;
-
-            checkQuestion = this.checkQuestion(question);
-            while(checkQuestion === false){
-                question = Math.floor(Math.random() * 10);
-                checkQuestion = this.checkQuestion(question);
-            }
-            this.#task[this.#questionBufferCount][]
-        }
-
-    }
-
-
-
-
-
-
-
-
 
 
     getMatheTask() {
@@ -195,6 +139,16 @@ class Model {
                 console.log("Lösungen: " + this.#Mathe[i][j]);
             }
         }
+        const { shuffledQuestions, rightAnswers } = this.taskRandomizer(this.#Mathe);
+        console.log("________________RANDOM__________________");
+
+        let j = 0;
+        for(let i = 0; i< shuffledQuestions.length; i++){
+            console.log(shuffledQuestions[i]);
+            console.log(rightAnswers[j]);
+            j++
+        }
+
     }
 
     getAllgemeinesTask(i) {
@@ -206,6 +160,16 @@ class Model {
                 console.log("Lösungen: " + this.#Allgemeines[i][j]);
             }
         }
+
+        const { shuffledQuestions, rightAnswers } = this.taskRandomizer(this.#Allgemeines);
+        console.log("________________RANDOM__________________");
+
+        let j = 0;
+        for(let i = 0; i< shuffledQuestions.length; i++){
+            console.log(shuffledQuestions[i]);
+            console.log(rightAnswers[j]);
+            j++
+        }
     }
 
     getIT1Task() {
@@ -216,6 +180,16 @@ class Model {
             for (let j = 1; j <= this.#FileWidth; j++) {
                 console.log("Lösungen: " + this.#IT1[i][j]);
             }
+        }
+
+        const { shuffledQuestions, rightAnswers } = this.taskRandomizer(this.#IT1);
+        console.log("________________RANDOM__________________");
+
+        let j = 0;
+        for(let i = 0; i< shuffledQuestions.length; i++){
+            console.log(shuffledQuestions[i]);
+            console.log(rightAnswers[j]);
+            j++
         }
     }
 }

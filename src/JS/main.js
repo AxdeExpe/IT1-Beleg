@@ -141,6 +141,35 @@ class Model {
         const {shuffledQuestions, rightAnswers} = this.taskRandomizer(this.#IT1);
         return { shuffledQuestions, rightAnswers };
     }
+
+    //------------------------------Warteschlange----------------------------
+    //TODO Warteschlange implementieren
+    #queue = new Array();
+    
+    queue(index){
+        this.#queue.push(index);
+        
+        //randomizing
+        for(let i = 0; i < this.#queue.length; i++){
+            let j = Math.floor(Math.random()*(i+1));
+            this.#queue[i] = this.#queue[j];
+        }
+    }
+
+    getQueue(index){
+        let task = this.#queue[index];
+        this.#queue.slice(index, index); //slicing the queue at index
+        console.log("Sliced: " + this.#queue);
+        return task;
+    }
+
+    //-------------------------------Statistic------------------------------
+    //TODO Statistik implementieren
+    #tries = 0
+
+    statistic(){
+
+    }
 }
 
 
@@ -253,16 +282,24 @@ class Presenter{
         }
         
     }
-    //-------------------------------queue-------------------------------
-    //TODO Warteschlange implementieren
+
+//--------------------------------Queue--------------------------------
+    #queue;
     
-    //-------------------------------Statistic------------------------------
-    #tries = 0
-    #
-    statistic(){
-        
+    setQueue(index){
+        this.#m.queue(index);
+    }
+    
+    getQueue(index){
+        this.#queue = this.#m.getQueue(index);
+        return this.#queue;
     }
 
+    
+    
+    
+    
+    
 }
 
 //---------------------View---------------------------------------------------------------------
@@ -270,12 +307,14 @@ class View {
     //Objects
     #p;
     #hidden = false;
-    #rightAnwsers
-    #Questions
-    #Progressbar = 0
+    #rightAnwsers;
+    #Questions;
+    #Progressbar = 0;
+    #indexQueue = 0;
     
-    #i
-    #j
+    
+    #i;
+    #j;
 
     constructor(p) {
         this.#p = p;
@@ -311,11 +350,28 @@ class View {
         button.style.backgroundColor = "red";
         this.#i++;
         this.#j++;
+        this.#p.setQueue(this.#i);
 
+        if(this.#i >= this.#rightAnwsers.length) {
+
+            let index = this.getQueueIndex();
+            console.log(index);
+            this.#indexQueue++;
+            this.setQueueTask(index);
+            this.setQueueAnswers(index);
+
+            await new Promise(r => setTimeout(r, 200)); //sleep
+            this.clearButtons(event);
+
+            return;
+        }
+        
+        
         //set new Task
         this.setNewTask();
         this.setNewAnswers();
-        await new Promise(r => setTimeout(r, 200));
+        
+        await new Promise(r => setTimeout(r, 200)); //sleep
         this.clearButtons(event);
     }
     
@@ -325,13 +381,38 @@ class View {
         this.#j++;
         this.#i++;
 
+        //set queue Tasks
+        if(this.#i >= this.#rightAnwsers.length) {
+
+            if(this.#Progressbar === 100){
+                this.showStatistics();
+                return;
+            }
+            
+            let index = this.getQueueIndex();
+            console.log(index);
+            this.#indexQueue++;
+            
+            this.#Progressbar += 100 / this.#rightAnwsers.length;
+            console.log(this.#Progressbar);
+            this.setProgressBar();
+            
+            this.setQueueTask(index);
+            this.setQueueAnswers(index);
+
+            await new Promise(r => setTimeout(r, 200)); //sleep
+            this.clearButtons(event);
+            
+            return;
+        }
+        
         //set new Task
         this.setNewTask();
         this.setNewAnswers();
         
         if(this.#Progressbar !== 100) {
             //progressbar
-            this.#Progressbar = 100 / this.#rightAnwsers.length;
+            this.#Progressbar += 100 / this.#rightAnwsers.length;
             console.log(this.#Progressbar);
             this.setProgressBar();
 
@@ -341,6 +422,10 @@ class View {
         else{
             this.showStatistics();
         }
+    }
+    
+    getQueueIndex(){
+        return this.#p.getQueue(this.#indexQueue);
     }
 
     showStatistics(){
@@ -363,11 +448,22 @@ class View {
         document.getElementById("question").textContent = this.#Questions[this.#i][0];
     }
 
+    setQueueTask(index){
+        document.getElementById("question").textContent = this.#Questions[index][0];
+    }
+
     setNewAnswers(){
         document.getElementById("answerA").textContent = "A: " + this.#Questions[this.#i][1];
         document.getElementById("answerB").textContent = "B: " + this.#Questions[this.#i][2];
         document.getElementById("answerC").textContent = "C: " + this.#Questions[this.#i][3];
         document.getElementById("answerD").textContent = "D: " + this.#Questions[this.#i][4];
+    }
+
+    setQueueAnswers(index){
+        document.getElementById("answerA").textContent = "A: " + this.#Questions[index][1];
+        document.getElementById("answerB").textContent = "B: " + this.#Questions[index][2];
+        document.getElementById("answerC").textContent = "C: " + this.#Questions[index][3];
+        document.getElementById("answerD").textContent = "D: " + this.#Questions[index][4];
     }
     
     callTask(event){

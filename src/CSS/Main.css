@@ -149,6 +149,20 @@ button:hover{
  z-index: 4;
 }
 
+.possibilitiesPlaceholder{
+ margin-right: auto;
+ margin-left: auto;
+ width: fit-content;
+ height: fit-content;
+ text-align: left;
+}
+
+.possibilities{
+ font-size: 15px;
+ margin: 0px;
+ text-align: left;
+}
+
 
 .progressBar{
  min-width: fit-content;

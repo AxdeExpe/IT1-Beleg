@@ -128,15 +128,18 @@ class Model {
 
 
     getMatheTask() {
-        return this.taskRandomizer(this.#Mathe);
+        const {shuffledQuestions, rightAnswers} = this.taskRandomizer(this.#Mathe);
+        return { shuffledQuestions, rightAnswers };
     }
 
     getAllgemeinesTask(i) {
-        return this.taskRandomizer(this.#Allgemeines);
+        const {shuffledQuestions, rightAnswers} = this.taskRandomizer(this.#Allgemeines);
+        return { shuffledQuestions, rightAnswers };
     }
 
     getIT1Task() {
-        return this.taskRandomizer(this.#IT1);
+        const {shuffledQuestions, rightAnswers} = this.taskRandomizer(this.#IT1);
+        return { shuffledQuestions, rightAnswers };
     }
 }
 
@@ -146,9 +149,6 @@ class Presenter{
     //Objects
     #m;
     #v;
-
-    //Var's
-    #File;
 
     start(){
        // let a = this.#m.getTask();
@@ -160,31 +160,33 @@ class Presenter{
     }
 
 //---------------------------------Task---------------------------------
-    #rightAnswers
+    #rightAnswers = []
     #shuffledQuestions
 
     Task(event){
         let topic = event.target.id;
 
         if(topic === "Mathe"){
-                const {shuffledQuestions, rigthAnswers} = this.#m.getMatheTask();
+                const {shuffledQuestions, rightAnswers} = this.#m.getMatheTask();
                 this.#shuffledQuestions = shuffledQuestions;
-                this.#rightAnswers = rigthAnswers;
+                this.#rightAnswers = rightAnswers;
 
-                return {shuffledQuestions, rigthAnswers};
+                return {shuffledQuestions, rightAnswers};
 
         }
         else if(topic === "IT 1"){
-            console.log("Topic: " + topic);
             const {shuffledQuestions, rightAnswers} = this.#m.getIT1Task();
             this.#shuffledQuestions = shuffledQuestions;
             this.#rightAnswers = rightAnswers;
+
+            return {shuffledQuestions, rightAnswers};
         }
         else if(topic === "Allgemeines"){
-            console.log("Topic: " + topic);
             const {shuffledQuestions, rightAnswers} = this.#m.getAllgemeinesTask();
             this.#shuffledQuestions = shuffledQuestions;
             this.#rightAnswers = rightAnswers;
+
+            return {shuffledQuestions, rightAnswers};
         }
         else{
             console.log("Topic is undefined!");
@@ -192,48 +194,75 @@ class Presenter{
     }
 
 //--------------------------------Answer--------------------------------
-    static checkAnswer(event){
-        let topic = document.getElementById("topic").innerHTML;
-        console.log(topic);
-        if(topic === "Mathe"){
-
-        }
-        if(topic === "IT 1"){
-
-
-        }
-        if(topic === "Allgemeines"){
-
-        }
-    }
-
-
-    buttonAction(event){
-
+    checkAnswer(event, j){
         let id = event.target.id;
+        console.log(id);
 
         switch(id) {
             case "A":
                 console.log("A pushed");
-                this.checkAnswer(event);
+                let A = document.getElementById("answerA").textContent;
+                console.log(A);
+                console.log(this.#rightAnswers[j]);
+                
+                if(A.match(this.#rightAnswers[j])){
+                    this.#v.rightAnswer(event);
+                    break;
+                }
+                this.#v.wrongAnswer(event);
                 break;
             case "B":
                 console.log("B pushed");
-                this.checkAnswer(event);
+                let B = document.getElementById("answerB").textContent;
+                console.log(B);
+                console.log(this.#rightAnswers[j]);
+                
+                if(B.match(this.#rightAnswers[j])){
+                    this.#v.rightAnswer(event);
+                    break;
+                }
+                this.#v.wrongAnswer(event);
                 break;
             case "C":
                 console.log("C pushed");
-                this.checkAnswer(event);
+                let C = document.getElementById("answerC").textContent;
+                console.log(C);
+                console.log(this.#rightAnswers[j]);
+                
+                if(C.match(this.#rightAnswers[j])){
+                    this.#v.rightAnswer(event);
+                    break;
+                }
+                this.#v.wrongAnswer(event);
                 break;
             case "D":
                 console.log("D pushed");
-                this.checkAnswer(event);
+                let D = document.getElementById("answerD").textContent;
+                console.log(D);
+                console.log(this.#rightAnswers[j]);
+                
+                if(D.match(this.#rightAnswers[j])){
+                    this.#v.rightAnswer(event);
+                    break;
+                }
+                this.#v.wrongAnswer(event);
                 break;
             default:
                 console.log("Wrong ID!");
                 break;
         }
+        
     }
+    //-------------------------------queue-------------------------------
+    //TODO Warteschlange implementieren
+    
+    //-------------------------------Statistic------------------------------
+    #tries = 0
+    #
+    statistic(){
+        
+    }
+
 }
 
 //---------------------View---------------------------------------------------------------------
@@ -241,6 +270,12 @@ class View {
     //Objects
     #p;
     #hidden = false;
+    #rightAnwsers
+    #Questions
+    #Progressbar = 0
+    
+    #i
+    #j
 
     constructor(p) {
         this.#p = p;
@@ -258,24 +293,97 @@ class View {
         document.getElementById("Allgemeines").addEventListener("click", this.callTask.bind(this));
 
         //answer button
+        document.getElementById("A").addEventListener("click", this.callButtonAction.bind(this));
+        document.getElementById("B").addEventListener("click", this.callButtonAction.bind(this));
+        document.getElementById("C").addEventListener("click", this.callButtonAction.bind(this));
+        document.getElementById("D").addEventListener("click", this.callButtonAction.bind(this));
         
-        if(document.getElementById("topic").innerHTML !== "IT1 - Beleg"){
-            document.getElementById("A").addEventListener("click", this.callButtonAction.bind(this));
-            document.getElementById("B").addEventListener("click", this.callButtonAction.bind(this));
-            document.getElementById("C").addEventListener("click", this.callButtonAction.bind(this));
-            document.getElementById("D").addEventListener("click", this.callButtonAction.bind(this));
+    }
+    
+    
+    //Tasks and answers
+    callButtonAction(event){
+        this.#p.checkAnswer(event, this.#j);
+    }
+    
+    async wrongAnswer(event) {
+        let button = document.getElementById(event.target.id);
+        button.style.backgroundColor = "red";
+        this.#i++;
+        this.#j++;
+
+        //set new Task
+        this.setNewTask();
+        this.setNewAnswers();
+        await new Promise(r => setTimeout(r, 200));
+        this.clearButtons(event);
+    }
+    
+    async rightAnswer(event) {
+        let button = document.getElementById(event.target.id); //sleep
+        button.style.backgroundColor = "green";
+        this.#j++;
+        this.#i++;
+
+        //set new Task
+        this.setNewTask();
+        this.setNewAnswers();
+        
+        if(this.#Progressbar !== 100) {
+            //progressbar
+            this.#Progressbar = 100 / this.#rightAnwsers.length;
+            console.log(this.#Progressbar);
+            this.setProgressBar();
+
+            await new Promise(r => setTimeout(r, 200)); //sleep
+            this.clearButtons(event);
+        }
+        else{
+            this.showStatistics();
         }
     }
 
-    callButtonAction(event){
-        this.#p.buttonAction(event);
+    showStatistics(){
+        //TODO Statistik anzeigen
+        this.#Progressbar = 0;
+    }
+    
+    setProgressBar(){
+        let progress = document.getElementById("progressBar");
+        progress.textContent = this.#Progressbar + "%";
+        progress.style.width = this.#Progressbar;
+    }
+    
+    clearButtons(event){
+        let button =  document.getElementById(event.target.id);
+        button.style.backgroundColor = null;
+    }
+    
+    setNewTask(){
+        document.getElementById("question").textContent = this.#Questions[this.#i][0];
     }
 
+    setNewAnswers(){
+        document.getElementById("answerA").textContent = "A: " + this.#Questions[this.#i][1];
+        document.getElementById("answerB").textContent = "B: " + this.#Questions[this.#i][2];
+        document.getElementById("answerC").textContent = "C: " + this.#Questions[this.#i][3];
+        document.getElementById("answerD").textContent = "D: " + this.#Questions[this.#i][4];
+    }
+    
     callTask(event){
-        const {shuffledQuestions, rightAnswers} = this.#p.Task(event);
-        document.getElementById("question").textContent = shuffledQuestions[0][0];
+        const {shuffledQuestions, rightAnswers} =this.#p.Task(event);
+        this.#rightAnwsers = rightAnswers;
+        this.#Questions = shuffledQuestions;
+        this.#i = 0;
+        this.#j = 0;
+        
+        this.setNewTask();
+        this.setNewAnswers();
     }
 
+    
+    
+    //Sidebar
     actSidebar(event) {
 
         if (event.target.nodeName.toLowerCase() === "button") {

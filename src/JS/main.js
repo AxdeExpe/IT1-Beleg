@@ -319,7 +319,6 @@ class View {
     constructor(p) {
         this.#p = p;
         this.setHandler();
-        this.showStatistics();
     }
 
     setHandler() {
@@ -444,18 +443,18 @@ class View {
         
         //child Tasks
         const divTasks = document.createElement("div");
-        const contentTasks = document.createTextNode("Du hast " + this.#i + " Aufgaben beantwortet.");
+        const contentTasks = document.createTextNode("Insgesamt beantwortet: " + this.#i);
         divTasks.appendChild(contentTasks);
         
         //child Wrong
         const divWrong = document.createElement("div");
-        const contentWrong  = document.createTextNode("Du hast " + this.#indexQueue + " Fehler gemacht.");
+        const contentWrong  = document.createTextNode("Falsch beantwortet: " + this.#indexQueue);
         divWrong.appendChild(contentWrong);
         
         //child Aall
         let right = this.#i - this.#indexQueue;
         const divAll = document.createElement("div");
-        const contentAll = document.createTextNode("Somit hast du " + right  + " Aufgaben richtig beantwortet");
+        const contentAll = document.createTextNode("Richtig beantwortet: " + right);
         divAll.appendChild(contentAll);
         
         divChild.appendChild(divTasks);
@@ -470,11 +469,14 @@ class View {
         div.style.display = "flex";
         div.style.width = "fit-content";
         div.style.padding = "10px";
-        div.style.paddingTop = "25vh";
-        div.style.paddingBottom = "25vh";
+        div.style.paddingTop = "20px";
+        div.style.paddingBottom = "20px";
         div.style.color = "whitesmoke";
         div.style.backgroundColor = "rgba(63, 63, 63,0.85)";
         div.style.borderRadius = "4px";
+        div.style.marginLeft = "auto";
+        div.style.marginRight = "auto";
+        div.style.marginTop = "max(15%, 15%)"
 
         const taskElement = document.getElementById("task");
         const parent = taskElement.parentNode;
@@ -530,8 +532,14 @@ class View {
         this.#i = 0;
         this.#j = 0;
         
+        this.showTask();
         this.setNewTask();
         this.setNewAnswers();
+        this.actSidebar(event);
+    }
+    
+    showTask(){
+        
     }
     
 
@@ -553,7 +561,7 @@ class View {
                     handler.style.marginLeft = "0px";
                     handler.style.transform = "scaleX(-1)";
                     handler.style.borderRadius = "5px 0px 0px 5px";
-                    handler.style.backgroundColor = "gray";
+                    handler.style.backgroundColor = "rgb(26, 26, 26)";
                     handler.style.border = "none";
 
                     console.log("Sidebar is hidden!");
@@ -565,13 +573,27 @@ class View {
 
                     let handler = document.getElementById("handler");
                     handler.style.marginLeft = "null";
-                    handler.style.backgroundColor = "gray";
+                    handler.style.backgroundColor = "rgb(26, 26, 26)";
                     handler.style.borderRadius = "0px 5px 5px 0px";
                     handler.style.removeProperty('borderColor');
                     handler.style.removeProperty('transform');
 
                     console.log("Sidebar is shown!");
                 }
+            }
+            else if(event.target.id === "IT 1" || event.target.id === "Allgemeines" || event.target.id === "Mathe"){
+                this.#hidden = true;
+                let sidebar = document.getElementById("sidebar");
+                sidebar.style.marginLeft = "-30vw";
+
+                let handler = document.getElementById("handler");
+                handler.style.marginLeft = "0px";
+                handler.style.transform = "scaleX(-1)";
+                handler.style.borderRadius = "5px 0px 0px 5px";
+                handler.style.backgroundColor = "rgb(26, 26, 26)";
+                handler.style.border = "none";
+
+                console.log("Sidebar is hidden!");
             }
         }
     }

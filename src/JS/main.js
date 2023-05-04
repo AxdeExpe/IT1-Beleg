@@ -132,7 +132,7 @@ class Model {
         return { shuffledQuestions, rightAnswers };
     }
 
-    getAllgemeinesTask(i) {
+    getAllgemeinesTask() {
         const {shuffledQuestions, rightAnswers} = this.taskRandomizer(this.#Allgemeines);
         return { shuffledQuestions, rightAnswers };
     }
@@ -144,7 +144,7 @@ class Model {
 
     //------------------------------Warteschlange----------------------------
     //TODO Warteschlange implementieren
-    #queue = new Array();
+    #queue = [];
     
     queue(index){
         this.#queue.push(index);
@@ -319,6 +319,7 @@ class View {
     constructor(p) {
         this.#p = p;
         this.setHandler();
+        this.showStatistics();
     }
 
     setHandler() {
@@ -342,7 +343,12 @@ class View {
     
     //Tasks and answers
     callButtonAction(event){
-        this.#p.checkAnswer(event, this.#j);
+        if(this.#i < this.#rightAnwsers.length) {
+            this.#p.checkAnswer(event, this.#j);
+        }
+        else{
+            this.#p.checkAnswer(event, this.#indexQueue);
+        }
     }
     
     async wrongAnswer(event) {
@@ -409,17 +415,16 @@ class View {
         //set new Task
         this.setNewTask();
         this.setNewAnswers();
-        
-        if(this.#Progressbar !== 100) {
-            //progressbar
-            this.#Progressbar += 100 / this.#rightAnwsers.length;
-            console.log(this.#Progressbar);
-            this.setProgressBar();
 
-            await new Promise(r => setTimeout(r, 200)); //sleep
-            this.clearButtons(event);
-        }
-        else{
+        //Progressbar
+        this.#Progressbar += 100 / this.#rightAnwsers.length;
+        console.log(this.#Progressbar);
+        this.setProgressBar();
+
+        await new Promise(r => setTimeout(r, 200)); //sleep
+        this.clearButtons(event);
+        
+        if(this.#Progressbar === 100){
             this.showStatistics();
         }
     }
@@ -429,14 +434,66 @@ class View {
     }
 
     showStatistics(){
-        //TODO Statistik anzeigen
+        //TODO Statistik centern
+        console.log("STATISTIK");
+        //parent
+        const div = document.createElement("div");
+        
+        //Child
+        const divChild = document.createElement("div");
+        
+        //child Tasks
+        const divTasks = document.createElement("div");
+        const contentTasks = document.createTextNode("Du hast " + this.#i + " Aufgaben beantwortet.");
+        divTasks.appendChild(contentTasks);
+        
+        //child Wrong
+        const divWrong = document.createElement("div");
+        const contentWrong  = document.createTextNode("Du hast " + this.#indexQueue + " Fehler gemacht.");
+        divWrong.appendChild(contentWrong);
+        
+        //child Aall
+        let right = this.#i - this.#indexQueue;
+        const divAll = document.createElement("div");
+        const contentAll = document.createTextNode("Somit hast du " + right  + " Aufgaben richtig beantwortet");
+        divAll.appendChild(contentAll);
+        
+        divChild.appendChild(divTasks);
+        divChild.appendChild(divWrong);
+        divChild.appendChild(divAll);
+        div.appendChild(divChild);
+
+        
+        divChild.style.position = "relative";
+        divChild.style.textAlign = "center";
+        
+        div.style.display = "flex";
+        div.style.width = "fit-content";
+        div.style.padding = "10px";
+        div.style.paddingTop = "25vh";
+        div.style.paddingBottom = "25vh";
+        div.style.color = "whitesmoke";
+        div.style.backgroundColor = "rgba(63, 63, 63,0.85)";
+        div.style.borderRadius = "4px";
+
+        const taskElement = document.getElementById("task");
+        const parent = taskElement.parentNode;
+        parent.insertBefore(div, taskElement);
+        parent.removeChild(taskElement);
+        
+        //sets all to 0
         this.#Progressbar = 0;
+        this.#i = 0;
+        this.#j = 0;
+        this.#indexQueue = 0;
+        this.#rightAnwsers = null;
+        this.#Questions = null;
     }
     
     setProgressBar(){
         let progress = document.getElementById("progressBar");
         progress.textContent = this.#Progressbar + "%";
-        progress.style.width = this.#Progressbar;
+        progress.style.width = this.#Progressbar + "%";
     }
     
     clearButtons(event){
@@ -476,6 +533,7 @@ class View {
         this.setNewTask();
         this.setNewAnswers();
     }
+    
 
     
     

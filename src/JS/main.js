@@ -318,6 +318,7 @@ class View {
 
     constructor(p) {
         this.#p = p;
+        this.showTask();
         this.setHandler();
     }
 
@@ -433,8 +434,6 @@ class View {
     }
 
     showStatistics(){
-        //TODO Statistik centern
-        console.log("STATISTIK");
         //parent
         const div = document.createElement("div");
         
@@ -539,6 +538,116 @@ class View {
     }
     
     showTask(){
+        //create <div's>
+        const task = document.createElement("div");
+        task.id = "task";
+        task.className = "task";
+        
+        const questionPlaceholder = document.createElement("div");
+        questionPlaceholder.className = "questionPlaceholder";
+        
+        const possibilitiesPlaceholder = document.createElement("div");
+        possibilitiesPlaceholder.className = "possibilitiesPlaceholder";
+        
+        const progressBarPlaceholder = document.createElement("div");
+        progressBarPlaceholder.className = "progressBarPlaceholder";
+        
+        const progressBar = document.createElement("div");
+        progressBar.id = "progressBar";
+        progressBar.className = "progressBar";
+        progressBar.innerHTML = "0%";
+        
+        const selection = document.createElement("div");
+        selection.className = "selection";
+        
+        const top = document.createElement("div");
+        top.className = "top";
+        
+        const bottom = document.createElement("div");
+        bottom.className = "bottom"
+
+
+        
+        //create <p>'s
+        const question = document.createElement("p");
+        question.id = "question";
+        question.innerHTML = "Aufgabe";
+        
+        const answerA = document.createElement("p");
+        answerA.id = "anwserA";
+        answerA.className = "possibilities";
+        answerA.innerHTML = "A: ";
+        
+        const answerB = document.createElement("p");
+        answerB.id = "answerB";
+        answerB.className = "possibilities";
+        answerB.innerHTML = "B: ";
+        
+        const answerC = document.createElement("p");
+        answerC.id = "answerC";
+        answerC.className = "possibilities";
+        answerC.innerHTML = "C: ";
+        
+        const answerD = document.createElement("p");
+        answerD.id = "answerD";
+        answerD.className = "possibilities";
+        answerD.innerHTML = "D: ";
+        
+        
+        
+        //create <buttons>
+        const A = document.createElement("button");
+        A.className = "answer";
+        A.id = "A";
+        A.innerHTML = "A";
+
+        const B = document.createElement("button");
+        B.className = "answer";
+        B.id = "B";
+        B.innerHTML = "B";
+
+        const C = document.createElement("button");
+        C.className = "answer";
+        C.id = "C";
+        C.innerHTML = "C";
+
+        const D = document.createElement("button");
+        D.className = "answer";
+        D.id = "D";
+        D.innerHTML = "D";
+        
+        
+        //put it all together
+        possibilitiesPlaceholder.appendChild(answerA);
+        possibilitiesPlaceholder.appendChild(answerB);
+        possibilitiesPlaceholder.appendChild(answerC);
+        possibilitiesPlaceholder.appendChild(answerD);
+        
+        questionPlaceholder.appendChild(question);
+        questionPlaceholder.appendChild(possibilitiesPlaceholder);
+        
+        task.appendChild(questionPlaceholder);
+        
+        
+        progressBarPlaceholder.appendChild(progressBar);
+        
+        task.appendChild(progressBarPlaceholder);
+        
+        
+        top.appendChild(A);
+        top.appendChild(B);
+        
+        bottom.appendChild(C);
+        bottom.appendChild(D);
+        
+        selection.appendChild(top);
+        selection.appendChild(bottom);
+        
+        task.appendChild(selection);
+
+        
+        const main = document.getElementById("main");
+        document.body.appendChild(task);
         
     }
     

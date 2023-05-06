@@ -311,6 +311,8 @@ class View {
     #Questions;
     #Progressbar = 0;
     #indexQueue = 0;
+    #showStatistics = false;
+    #showTask = false;
     
     
     #i;
@@ -318,7 +320,7 @@ class View {
 
     constructor(p) {
         this.#p = p;
-        this.showTask();
+
         this.setHandler();
     }
 
@@ -331,13 +333,14 @@ class View {
         document.getElementById("Mathe").addEventListener("click", this.callTask.bind(this));
         document.getElementById("IT 1").addEventListener("click", this.callTask.bind(this));
         document.getElementById("Allgemeines").addEventListener("click", this.callTask.bind(this));
-
+    }
+    
+    setAnswerHandler(){
         //answer button
         document.getElementById("A").addEventListener("click", this.callButtonAction.bind(this));
         document.getElementById("B").addEventListener("click", this.callButtonAction.bind(this));
         document.getElementById("C").addEventListener("click", this.callButtonAction.bind(this));
         document.getElementById("D").addEventListener("click", this.callButtonAction.bind(this));
-        
     }
     
     
@@ -391,6 +394,7 @@ class View {
         if(this.#i >= this.#rightAnwsers.length) {
 
             if(this.#Progressbar === 100){
+                this.#showStatistics = false;
                 this.showStatistics();
                 return;
             }
@@ -434,61 +438,66 @@ class View {
     }
 
     showStatistics(){
-        //parent
-        const div = document.createElement("div");
-        
-        //Child
-        const divChild = document.createElement("div");
-        
-        //child Tasks
-        const divTasks = document.createElement("div");
-        const contentTasks = document.createTextNode("Insgesamt beantwortet: " + this.#i);
-        divTasks.appendChild(contentTasks);
-        
-        //child Wrong
-        const divWrong = document.createElement("div");
-        const contentWrong  = document.createTextNode("Falsch beantwortet: " + this.#indexQueue);
-        divWrong.appendChild(contentWrong);
-        
-        //child Aall
-        let right = this.#i - this.#indexQueue;
-        const divAll = document.createElement("div");
-        const contentAll = document.createTextNode("Richtig beantwortet: " + right);
-        divAll.appendChild(contentAll);
-        
-        divChild.appendChild(divTasks);
-        divChild.appendChild(divWrong);
-        divChild.appendChild(divAll);
-        div.appendChild(divChild);
+        if(this.#showStatistics === false) {
+            this.#showStatistics = true;
+            this.#showTask = false;
+            //parent
+            const div = document.createElement("div");
+            div.id = "statistic";
 
-        
-        divChild.style.position = "relative";
-        divChild.style.textAlign = "center";
-        
-        div.style.display = "flex";
-        div.style.width = "fit-content";
-        div.style.padding = "10px";
-        div.style.paddingTop = "20px";
-        div.style.paddingBottom = "20px";
-        div.style.color = "whitesmoke";
-        div.style.backgroundColor = "rgba(63, 63, 63,0.85)";
-        div.style.borderRadius = "4px";
-        div.style.marginLeft = "auto";
-        div.style.marginRight = "auto";
-        div.style.marginTop = "max(15%, 15%)"
+            //Child
+            const divChild = document.createElement("div");
 
-        const taskElement = document.getElementById("task");
-        const parent = taskElement.parentNode;
-        parent.insertBefore(div, taskElement);
-        parent.removeChild(taskElement);
-        
-        //sets all to 0
-        this.#Progressbar = 0;
-        this.#i = 0;
-        this.#j = 0;
-        this.#indexQueue = 0;
-        this.#rightAnwsers = null;
-        this.#Questions = null;
+            //child Tasks
+            const divTasks = document.createElement("div");
+            const contentTasks = document.createTextNode("Insgesamt beantwortet: " + this.#i);
+            divTasks.appendChild(contentTasks);
+
+            //child Wrong
+            const divWrong = document.createElement("div");
+            const contentWrong = document.createTextNode("Falsch beantwortet: " + this.#indexQueue);
+            divWrong.appendChild(contentWrong);
+
+            //child Aall
+            let right = this.#i - this.#indexQueue;
+            const divAll = document.createElement("div");
+            const contentAll = document.createTextNode("Richtig beantwortet: " + right);
+            divAll.appendChild(contentAll);
+
+            divChild.appendChild(divTasks);
+            divChild.appendChild(divWrong);
+            divChild.appendChild(divAll);
+            div.appendChild(divChild);
+
+
+            divChild.style.position = "relative";
+            divChild.style.textAlign = "center";
+
+            div.style.display = "flex";
+            div.style.width = "fit-content";
+            div.style.padding = "10px";
+            div.style.paddingTop = "20px";
+            div.style.paddingBottom = "20px";
+            div.style.color = "whitesmoke";
+            div.style.backgroundColor = "rgba(63, 63, 63,0.85)";
+            div.style.borderRadius = "4px";
+            div.style.marginLeft = "auto";
+            div.style.marginRight = "auto";
+            div.style.marginTop = "max(15%, 15%)"
+
+            const taskElement = document.getElementById("task");
+            const parent = taskElement.parentNode;
+            parent.insertBefore(div, taskElement);
+            parent.removeChild(taskElement);
+
+            //sets all to 0
+            this.#Progressbar = 0;
+            this.#i = 0;
+            this.#j = 0;
+            this.#indexQueue = 0;
+            this.#rightAnwsers = null;
+            this.#Questions = null;
+        }
     }
     
     setProgressBar(){
@@ -530,125 +539,135 @@ class View {
         this.#Questions = shuffledQuestions;
         this.#i = 0;
         this.#j = 0;
+        this.#Progressbar = 0;
         
+        if(document.getElementById("progressBar")) {
+            this.setProgressBar();
+        }
         this.showTask();
+        this.setAnswerHandler();
         this.setNewTask();
         this.setNewAnswers();
         this.actSidebar(event);
     }
     
     showTask(){
-        //create <div's>
-        const task = document.createElement("div");
-        task.id = "task";
-        task.className = "task";
+        if(this.#showStatistics === true){
+           document.getElementById("statistic").remove();
+           this.#showStatistics = false;
+        }
         
-        const questionPlaceholder = document.createElement("div");
-        questionPlaceholder.className = "questionPlaceholder";
-        
-        const possibilitiesPlaceholder = document.createElement("div");
-        possibilitiesPlaceholder.className = "possibilitiesPlaceholder";
-        
-        const progressBarPlaceholder = document.createElement("div");
-        progressBarPlaceholder.className = "progressBarPlaceholder";
-        
-        const progressBar = document.createElement("div");
-        progressBar.id = "progressBar";
-        progressBar.className = "progressBar";
-        progressBar.innerHTML = "0%";
-        
-        const selection = document.createElement("div");
-        selection.className = "selection";
-        
-        const top = document.createElement("div");
-        top.className = "top";
-        
-        const bottom = document.createElement("div");
-        bottom.className = "bottom"
+        if(this.#showTask === false) {
+            this.#showTask = true;
+            //create <div's>
+            const task = document.createElement("div");
+            task.id = "task";
+            task.className = "task";
+
+            const questionPlaceholder = document.createElement("div");
+            questionPlaceholder.className = "questionPlaceholder";
+
+            const possibilitiesPlaceholder = document.createElement("div");
+            possibilitiesPlaceholder.className = "possibilitiesPlaceholder";
+
+            const progressBarPlaceholder = document.createElement("div");
+            progressBarPlaceholder.className = "progressBarPlaceholder";
+
+            const progressBar = document.createElement("div");
+            progressBar.id = "progressBar";
+            progressBar.className = "progressBar";
+            progressBar.innerHTML = "0%";
+
+            const selection = document.createElement("div");
+            selection.className = "selection";
+
+            const top = document.createElement("div");
+            top.className = "top";
+
+            const bottom = document.createElement("div");
+            bottom.className = "bottom"
 
 
-        
-        //create <p>'s
-        const question = document.createElement("p");
-        question.id = "question";
-        question.innerHTML = "Aufgabe";
-        
-        const answerA = document.createElement("p");
-        answerA.id = "anwserA";
-        answerA.className = "possibilities";
-        answerA.innerHTML = "A: ";
-        
-        const answerB = document.createElement("p");
-        answerB.id = "answerB";
-        answerB.className = "possibilities";
-        answerB.innerHTML = "B: ";
-        
-        const answerC = document.createElement("p");
-        answerC.id = "answerC";
-        answerC.className = "possibilities";
-        answerC.innerHTML = "C: ";
-        
-        const answerD = document.createElement("p");
-        answerD.id = "answerD";
-        answerD.className = "possibilities";
-        answerD.innerHTML = "D: ";
-        
-        
-        
-        //create <buttons>
-        const A = document.createElement("button");
-        A.className = "answer";
-        A.id = "A";
-        A.innerHTML = "A";
+            //create <p>'s
+            const question = document.createElement("p");
+            question.id = "question";
+            question.innerHTML = "Aufgabe";
 
-        const B = document.createElement("button");
-        B.className = "answer";
-        B.id = "B";
-        B.innerHTML = "B";
+            const answerA = document.createElement("p");
+            answerA.id = "answerA";
+            answerA.className = "possibilities";
+            answerA.innerHTML = "A: ";
 
-        const C = document.createElement("button");
-        C.className = "answer";
-        C.id = "C";
-        C.innerHTML = "C";
+            const answerB = document.createElement("p");
+            answerB.id = "answerB";
+            answerB.className = "possibilities";
+            answerB.innerHTML = "B: ";
 
-        const D = document.createElement("button");
-        D.className = "answer";
-        D.id = "D";
-        D.innerHTML = "D";
-        
-        
-        //put it all together
-        possibilitiesPlaceholder.appendChild(answerA);
-        possibilitiesPlaceholder.appendChild(answerB);
-        possibilitiesPlaceholder.appendChild(answerC);
-        possibilitiesPlaceholder.appendChild(answerD);
-        
-        questionPlaceholder.appendChild(question);
-        questionPlaceholder.appendChild(possibilitiesPlaceholder);
-        
-        task.appendChild(questionPlaceholder);
-        
-        
-        progressBarPlaceholder.appendChild(progressBar);
-        
-        task.appendChild(progressBarPlaceholder);
-        
-        
-        top.appendChild(A);
-        top.appendChild(B);
-        
-        bottom.appendChild(C);
-        bottom.appendChild(D);
-        
-        selection.appendChild(top);
-        selection.appendChild(bottom);
-        
-        task.appendChild(selection);
+            const answerC = document.createElement("p");
+            answerC.id = "answerC";
+            answerC.className = "possibilities";
+            answerC.innerHTML = "C: ";
 
-        
-        const main = document.getElementById("main");
-        document.body.appendChild(task);
-        
+            const answerD = document.createElement("p");
+            answerD.id = "answerD";
+            answerD.className = "possibilities";
+            answerD.innerHTML = "D: ";
+
+
+            //create <buttons>
+            const A = document.createElement("button");
+            A.className = "answer";
+            A.id = "A";
+            A.innerHTML = "A";
+
+            const B = document.createElement("button");
+            B.className = "answer";
+            B.id = "B";
+            B.innerHTML = "B";
+
+            const C = document.createElement("button");
+            C.className = "answer";
+            C.id = "C";
+            C.innerHTML = "C";
+
+            const D = document.createElement("button");
+            D.className = "answer";
+            D.id = "D";
+            D.innerHTML = "D";
+
+
+            //put it all together
+            possibilitiesPlaceholder.appendChild(answerA);
+            possibilitiesPlaceholder.appendChild(answerB);
+            possibilitiesPlaceholder.appendChild(answerC);
+            possibilitiesPlaceholder.appendChild(answerD);
+
+            questionPlaceholder.appendChild(question);
+            questionPlaceholder.appendChild(possibilitiesPlaceholder);
+
+            task.appendChild(questionPlaceholder);
+
+
+            progressBarPlaceholder.appendChild(progressBar);
+
+            task.appendChild(progressBarPlaceholder);
+
+
+            top.appendChild(A);
+            top.appendChild(B);
+
+            bottom.appendChild(C);
+            bottom.appendChild(D);
+
+            selection.appendChild(top);
+            selection.appendChild(bottom);
+
+            task.appendChild(selection);
+
+
+            const main = document.getElementById("main");
+            document.body.appendChild(task);
+        }
     }
     
 

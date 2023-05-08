@@ -158,17 +158,15 @@ class Model {
 
     getQueue(index){
         let task = this.#queue[index];
-        this.#queue.slice(index, index); //slicing the queue at index
+        console.log("INDEX: " + index)
+        console.log("SLICED ELEMENT: " + task);
+        this.#queue.splice(index, 1); //slicing the queue at index
         console.log("Sliced: " + this.#queue);
         return task;
     }
-
-    //-------------------------------Statistic------------------------------
-    //TODO Statistik implementieren
-    #tries = 0
-
-    statistic(){
-
+    
+    delQueue(){
+        this.#queue = [];
     }
 }
 
@@ -194,11 +192,16 @@ class Presenter{
 
     Task(event){
         let topic = event.target.id;
+        this.#shuffledQuestions = null;
+        this.#rightAnswers = null;
+        //console.log("NEU: " + this.#shuffledQuestions)
 
         if(topic === "Mathe"){
                 const {shuffledQuestions, rightAnswers} = this.#m.getMatheTask();
                 this.#shuffledQuestions = shuffledQuestions;
                 this.#rightAnswers = rightAnswers;
+                console.log("NEUE AUFGABEN: " + this.#shuffledQuestions);
+                console.log("NEUE ANTWORTEN: " + this.#rightAnswers);
 
                 return {shuffledQuestions, rightAnswers};
 
@@ -225,14 +228,14 @@ class Presenter{
 //--------------------------------Answer--------------------------------
     checkAnswer(event, j){
         let id = event.target.id;
-        console.log(id);
+        //console.log(id);
 
         switch(id) {
             case "A":
                 console.log("A pushed");
                 let A = document.getElementById("answerA").textContent;
                 console.log(A);
-                console.log(this.#rightAnswers[j]);
+                console.log("Richtige Antwort: " + this.#rightAnswers[j]);
                 
                 if(A.match(this.#rightAnswers[j])){
                     this.#v.rightAnswer(event);
@@ -244,7 +247,7 @@ class Presenter{
                 console.log("B pushed");
                 let B = document.getElementById("answerB").textContent;
                 console.log(B);
-                console.log(this.#rightAnswers[j]);
+                console.log("Richtige Antwort: " + this.#rightAnswers[j]);
                 
                 if(B.match(this.#rightAnswers[j])){
                     this.#v.rightAnswer(event);
@@ -256,7 +259,7 @@ class Presenter{
                 console.log("C pushed");
                 let C = document.getElementById("answerC").textContent;
                 console.log(C);
-                console.log(this.#rightAnswers[j]);
+                console.log("Richtige Antwort: " + this.#rightAnswers[j]);
                 
                 if(C.match(this.#rightAnswers[j])){
                     this.#v.rightAnswer(event);
@@ -268,7 +271,7 @@ class Presenter{
                 console.log("D pushed");
                 let D = document.getElementById("answerD").textContent;
                 console.log(D);
-                console.log(this.#rightAnswers[j]);
+                console.log("Richtige Antwort: " + this.#rightAnswers[j]);
                 
                 if(D.match(this.#rightAnswers[j])){
                     this.#v.rightAnswer(event);
@@ -292,14 +295,13 @@ class Presenter{
     
     getQueue(index){
         this.#queue = this.#m.getQueue(index);
+        console.log("Queue Antwort: " + this.#queue)
         return this.#queue;
     }
-
     
-    
-    
-    
-    
+    delQueue(){
+        this.#m.delQueue();
+    }
 }
 
 //---------------------View---------------------------------------------------------------------
@@ -307,16 +309,17 @@ class View {
     //Objects
     #p;
     #hidden = false;
-    #rightAnwsers;
-    #Questions;
+    #rightAnwsers = null;
+    #Questions = null;
     #Progressbar = 0;
     #indexQueue = 0;
+    #taskQueue = null;
     #showStatistics = false;
     #showTask = false;
     
-    
-    #i;
-    #j;
+    #answerHandle = 0;
+    #i = 0;
+    #j = 0;
 
     constructor(p) {
         this.#p = p;
@@ -357,24 +360,28 @@ class View {
     async wrongAnswer(event) {
         let button = document.getElementById(event.target.id);
         button.style.backgroundColor = "red";
+
         this.#i++;
         this.#j++;
-        this.#p.setQueue(this.#i);
 
         if(this.#i >= this.#rightAnwsers.length) {
 
-            let index = this.getQueueIndex();
-            console.log(index);
-            this.#indexQueue++;
-            this.setQueueTask(index);
-            this.setQueueAnswers(index);
+            this.#p.setQueue(this.#taskQueue);
+            
+            this.#taskQueue = this.getQueueIndex();
+            console.log("Queue index: " + this.#indexQueue);
+            
+            this.setQueueTask(this.#taskQueue);
+            this.setQueueAnswers(this.#taskQueue);
 
             await new Promise(r => setTimeout(r, 200)); //sleep
             this.clearButtons(event);
+            
+            this.#indexQueue++;
 
             return;
         }
-        
+        this.#p.setQueue(this.#i);
         
         //set new Task
         this.setNewTask();
@@ -387,28 +394,31 @@ class View {
     async rightAnswer(event) {
         let button = document.getElementById(event.target.id); //sleep
         button.style.backgroundColor = "green";
+
         this.#j++;
         this.#i++;
+        
 
         //set queue Tasks
         if(this.#i >= this.#rightAnwsers.length) {
-
+            //const newLength = this.#i - this.#rightAnwsers.length;
+            
             if(this.#Progressbar === 100){
                 this.#showStatistics = false;
                 this.showStatistics();
                 return;
             }
             
-            let index = this.getQueueIndex();
-            console.log(index);
+            this.#taskQueue= this.getQueueIndex();
+            console.log("Queue index: " + this.#taskQueue);
             this.#indexQueue++;
             
             this.#Progressbar += 100 / this.#rightAnwsers.length;
             console.log(this.#Progressbar);
             this.setProgressBar();
             
-            this.setQueueTask(index);
-            this.setQueueAnswers(index);
+            this.setQueueTask(this.#taskQueue);
+            this.setQueueAnswers(this.#taskQueue);
 
             await new Promise(r => setTimeout(r, 200)); //sleep
             this.clearButtons(event);
@@ -427,6 +437,7 @@ class View {
 
         await new Promise(r => setTimeout(r, 200)); //sleep
         this.clearButtons(event);
+        
         
         if(this.#Progressbar === 100){
             this.showStatistics();
@@ -469,21 +480,8 @@ class View {
             divChild.appendChild(divAll);
             div.appendChild(divChild);
 
-
-            divChild.style.position = "relative";
-            divChild.style.textAlign = "center";
-
-            div.style.display = "flex";
-            div.style.width = "fit-content";
-            div.style.padding = "10px";
-            div.style.paddingTop = "20px";
-            div.style.paddingBottom = "20px";
-            div.style.color = "whitesmoke";
-            div.style.backgroundColor = "rgba(63, 63, 63,0.85)";
-            div.style.borderRadius = "4px";
-            div.style.marginLeft = "auto";
-            div.style.marginRight = "auto";
-            div.style.marginTop = "max(15%, 15%)"
+            divChild.className = "statistic";
+            div.className = "statisticPlaceholder";
 
             const taskElement = document.getElementById("task");
             const parent = taskElement.parentNode;
@@ -516,6 +514,7 @@ class View {
     }
 
     setQueueTask(index){
+        console.log("INDEX QUEUE: " + index)
         document.getElementById("question").textContent = this.#Questions[index][0];
     }
 
@@ -534,9 +533,13 @@ class View {
     }
     
     callTask(event){
+        this.#rightAnwsers = null;
+        this.#Questions = null;
         const {shuffledQuestions, rightAnswers} =this.#p.Task(event);
         this.#rightAnwsers = rightAnswers;
         this.#Questions = shuffledQuestions;
+        this.#indexQueue = 0;
+        this.#p.delQueue();
         this.#i = 0;
         this.#j = 0;
         this.#Progressbar = 0;
@@ -545,7 +548,12 @@ class View {
             this.setProgressBar();
         }
         this.showTask();
-        this.setAnswerHandler();
+        
+        //wenn ich während der Aufgaben die topics wechsel, buggt ansonsten
+        if(this.#answerHandle === 0) {
+            this.setAnswerHandler();
+        }
+        this.#answerHandle++;
         this.setNewTask();
         this.setNewAnswers();
         this.actSidebar(event);

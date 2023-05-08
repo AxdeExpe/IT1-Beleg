@@ -232,3 +232,21 @@ button:hover{
 
  z-index: 3;
 }
+
+.statisticPlaceholder{
+ display: flex;
+ width: fit-content;
+ padding: 10px;
+ padding-top: 20px;
+ color: whitesmoke;
+ background-color: rgba(63, 63, 63,0.85);
+ border-radius: 4px;
+ margin-left: auto;
+ margin-right: auto;
+ margin-top: max(15%, 15%);
+}
+
+.statistic{
+ position: relative;
+ text-align: center;
+}

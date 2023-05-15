@@ -1,17 +1,18 @@
 body{
  font-family: arial;
- background-image: url(/Lernprogramm/src/Image/BackgroundImage.jpg);
+ background-image: url(/IT1-Beleg/src/Image/BackgroundImage.jpg);
  background-color: gray;
  background-repeat: no-repeat;
- background-position: center;
  background-size: cover;
+ background-position: center;
+ height: 100vh;
  background-color: #4b4b4b;
 }
 
 header{
  margin-top: -8px;
  right: 0;
- padding: 5px;
+ padding: 6px;
  background-color: rgba(0,0,0,0.8);
  margin-left: -8px;
  margin-right: -8px;
@@ -23,7 +24,9 @@ h2{
  text-align: center;
 }
 
-.sidebar {
+.sidebar{
+ margin-top: auto;
+ margin-bottom: auto;
  height: 96vh;
  width: 30vw;
  min-width: fit-content;
@@ -72,7 +75,7 @@ h1{
 }
 
 .handlerPlaceholder{
- position: absolute;
+ position: sticky;
  left: 0;
  top: 50%;
 

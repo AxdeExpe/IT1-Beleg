@@ -165,7 +165,7 @@ button:hover{
 .progressBar{
  min-width: fit-content;
  max-width: 100%;
- width: 25%; /*needs change in script*/
+ width: 0%; /*needs change in script*/
  margin-right: auto;
  margin-left: auto;
  background-color: rgb(68, 159, 250);

@@ -1,40 +1,129 @@
 "use strict"
-//import loadFile from './loadFile.js';
 
 document.addEventListener('DOMContentLoaded', function (){
     let m, p, v;
+    
     m = new Model();
-
     p = new Presenter();
     v = new View(p);
     p.setModelAndView(m,v);
     p.start();
 
+    if('serviceWorker' in navigator){
+        navigator.serviceWorker.register("../JS/sw.js")
+            .then((reg) => console.log("service worker registered!", reg))
+            .catch((err) => console.log("service worker not registered", err));
+    }
 })
 
 //---------------------Model--------------------------------------------------------------------
 class Model {
     //Var's
+    #xhr;
     #FileLength = 10; //Anzahl Aufgaben
     #FileWidth = 4; //Anzahl Lösungen pro Aufgabe
 
+    //AJAX
+    #Task;
+    #answer = new Array(this.#FileWidth);
+    #solve;
 
-    #Allgemeines = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
-    #Mathe = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
-    #IT1 = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth+1));
+    //Offline
+    #Allgemeines = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth + 1));
+    #Mathe = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth + 1));
+    #IT1 = Array.from(Array(this.#FileLength), () => new Array(this.#FileWidth + 1));
 
     constructor() {
+        if (window.XMLHttpRequest) {
+            this.#xhr = new XMLHttpRequest();
+        }
         this.loadMathe();
         this.loadAllgemeines();
         this.loadIT1();
     }
 
+//-------------------------------AJAX----------------------------------
+
+    sendXHR(index) {
+        var self = this;
+
+        this.#xhr.onreadystatechange = function () {
+            if (this.readyState !== 4) {
+                return;
+            }
+            if (this.status === 200) {
+                var json = JSON.parse(this.responseText);
+                //console.log(json.options);
+                self.setTaskAnswer(json);
+            }
+        }
+
+        this.#xhr.open('GET', 'https://irene.informatik.htw-dresden.de:8888/api/quizzes/' + index, false);
+        this.#xhr.setRequestHeader("Authorization", "Basic " + btoa("test@gmail.com:secret"));
+        this.#xhr.send(null);
+    }
+
+    Solve(index, data) {
+        var self = this;
+
+        this.#xhr.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+
+                var json = JSON.parse(this.responseText);
+                var bool = json.success;
+
+                console.log("JSON: " + bool);
+
+                self.setSolve(bool);
+            }
+        };
+        this.#xhr.open('POST', 'https://irene.informatik.htw-dresden.de:8888/api/quizzes/' + index + '/solve', false);
+        this.#xhr.setRequestHeader("Authorization", "Basic " + btoa("test@gmail.com:secret"));
+        this.#xhr.setRequestHeader("Content-Type", "application/json");
+        this.#xhr.send('[' + data + ']');
+    }
+
+    setTaskAnswer(json) {
+        this.#Task = json.text;
+        console.log("TASK: " + this.#Task);
+
+        for (let i = 0; i < json.options.length; i++) {
+            this.#answer[i] = json.options[i];
+        }
+    }
+    
+    getTask(){
+        return this.#Task;
+    }
+    
+    getAnswer(){
+        return this.#answer;
+    }
+
+    initializeTask(index) {
+        this.sendXHR(index);
+
+        console.log("Task 2: " + this.#Task)
+        console.log("Answer 2: " + this.#answer);
+    }
+
+    setSolve(bool) {
+        this.#solve = bool;
+    }
+
+    getSolve(index, data) {
+        this.Solve(index, data);
+        return this.#solve;
+    }
+
+
 //-------------------------------LoadFiles--------------------------------
+
     loadMathe() {
         fetch("../JSON/Mathe.json")
             .then(response => response.json())
             .then(data => {
-               // console.log("Mathe");
+                // console.log("Mathe");
 
                 for (let i = 0; i < this.#FileLength; i++) {
 
@@ -45,7 +134,7 @@ class Model {
                     for (let j = 1; j <= this.#FileWidth; j++) {
 
                         //Lösungen
-                        this.#Mathe[i][j] = data.Mathe[i].l[j-1];
+                        this.#Mathe[i][j] = data.Mathe[i].l[j - 1];
                         //console.log("Antwort: " + this.#Mathe[i][j]);
                     }
                 }
@@ -56,7 +145,7 @@ class Model {
         fetch("../JSON/Allgemeines.json")
             .then(response => response.json())
             .then(data => {
-               // console.log("Allgemeines");
+                // console.log("Allgemeines");
 
                 for (let i = 0; i < this.#FileLength; i++) {
 
@@ -67,8 +156,8 @@ class Model {
                     for (let j = 1; j <= this.#FileWidth; j++) {
 
                         //Lösungen
-                        this.#Allgemeines[i][j] = data.Allgemeines[i].l[j-1];
-                       //console.log("Antwort: " + this.#Allgemeines[i][j]);
+                        this.#Allgemeines[i][j] = data.Allgemeines[i].l[j - 1];
+                        //console.log("Antwort: " + this.#Allgemeines[i][j]);
                     }
                 }
             });
@@ -78,7 +167,7 @@ class Model {
         fetch("../JSON/IT 1.json")
             .then(response => response.json())
             .then(data => {
-               // console.log("IT1");
+                // console.log("IT1");
 
                 for (let i = 0; i < this.#FileLength; i++) {
 
@@ -89,18 +178,19 @@ class Model {
                     for (let j = 1; j <= this.#FileWidth; j++) {
 
                         //Lösungen
-                        this.#IT1[i][j] = data.IT1[i].l[j-1];
+                        this.#IT1[i][j] = data.IT1[i].l[j - 1];
                         //console.log("Antwort: " + this.#IT1[i][j]);
                     }
                 }
             });
     }
 
+
 //------------------------------Randomizing-------------------------------
 
     //question = [Aufgabe 1, Antwort 1, Antwort 2, Antwort 3, Antwort 4, Aufgabe 2, Antwort 1, Antwort 2, Antwort 3, Antwort 4, ...]
     //Anzahl = 5, Verhältnis = 1 : 5
-    taskRandomizer(questions){
+    taskRandomizer(questions) {
 
         const shuffledQuestions = questions.slice();
         const rightAnswers = [];
@@ -123,69 +213,42 @@ class Model {
             rightAnswers.push(rightAnswer); // Füge die richtige Antwort zum rightAnswers-Array hinzu
         }
 
-        return { shuffledQuestions, rightAnswers };
+        return {shuffledQuestions, rightAnswers};
     }
 
 
     getMatheTask() {
         const {shuffledQuestions, rightAnswers} = this.taskRandomizer(this.#Mathe);
-        return { shuffledQuestions, rightAnswers };
+        return {shuffledQuestions, rightAnswers};
     }
 
     getAllgemeinesTask() {
         const {shuffledQuestions, rightAnswers} = this.taskRandomizer(this.#Allgemeines);
-        return { shuffledQuestions, rightAnswers };
+        return {shuffledQuestions, rightAnswers};
     }
 
     getIT1Task() {
         const {shuffledQuestions, rightAnswers} = this.taskRandomizer(this.#IT1);
-        return { shuffledQuestions, rightAnswers };
-    }
-
-    //------------------------------Warteschlange----------------------------
-    //TODO Warteschlange implementieren
-    #queue = [];
-    
-    queue(index){
-        this.#queue.push(index);
-        
-        //randomizing
-        for(let i = 0; i < this.#queue.length; i++){
-            let j = Math.floor(Math.random()*(i+1));
-            this.#queue[i] = this.#queue[j];
-        }
-    }
-
-    getQueue(index){
-        let task = this.#queue[index];
-        console.log("INDEX: " + index)
-        console.log("SLICED ELEMENT: " + task);
-        this.#queue.splice(index, 1); //slicing the queue at index
-        console.log("Sliced: " + this.#queue);
-        return task;
-    }
-    
-    delQueue(){
-        this.#queue = [];
+        return {shuffledQuestions, rightAnswers};
     }
 }
-
-
 //---------------------Presenter----------------------------------------------------------------
 class Presenter{
     //Objects
+    #xhr;
     #m;
     #v;
 
     start(){
-       // let a = this.#m.getTask();
+        //this.setXhr(this.#m.getAjax());
+       // this.#v.getFirstAjax();
     }
 
     setModelAndView(m, v){
         this.#m = m;
         this.#v = v;
     }
-
+    
 //---------------------------------Task---------------------------------
     #rightAnswers = []
     #shuffledQuestions
@@ -225,55 +288,59 @@ class Presenter{
         }
     }
 
+//--------------------------------Ajax----------------------------------   
+    initializeAjaxTask(index){
+        return this.#m.initializeTask(index);
+    }
+    
+    getTask(){
+        return this.#m.getTask();
+    }
+    
+    getAnswer(){
+        return this.#m.getAnswer();
+    }
+    
+    getAjaxSolve(index, data){
+        return this.#m.getSolve(index, data);
+    }
+
 //--------------------------------Answer--------------------------------
     checkAnswer(event, j){
         let id = event.target.id;
-        //console.log(id);
-
+        
         switch(id) {
             case "A":
-                console.log("A pushed");
                 let A = document.getElementById("answerA").textContent;
-                console.log(A);
-                console.log("Richtige Antwort: " + this.#rightAnswers[j]);
                 
-                if(A.match(this.#rightAnswers[j])){
+                if (A.match(this.#rightAnswers[j])) {
                     this.#v.rightAnswer(event);
                     break;
                 }
                 this.#v.wrongAnswer(event);
                 break;
             case "B":
-                console.log("B pushed");
                 let B = document.getElementById("answerB").textContent;
-                console.log(B);
-                console.log("Richtige Antwort: " + this.#rightAnswers[j]);
-                
-                if(B.match(this.#rightAnswers[j])){
+
+                if (B.match(this.#rightAnswers[j])) {
                     this.#v.rightAnswer(event);
                     break;
                 }
                 this.#v.wrongAnswer(event);
                 break;
             case "C":
-                console.log("C pushed");
                 let C = document.getElementById("answerC").textContent;
-                console.log(C);
-                console.log("Richtige Antwort: " + this.#rightAnswers[j]);
-                
-                if(C.match(this.#rightAnswers[j])){
+
+                if (C.match(this.#rightAnswers[j])) {
                     this.#v.rightAnswer(event);
                     break;
                 }
                 this.#v.wrongAnswer(event);
                 break;
             case "D":
-                console.log("D pushed");
                 let D = document.getElementById("answerD").textContent;
-                console.log(D);
-                console.log("Richtige Antwort: " + this.#rightAnswers[j]);
-                
-                if(D.match(this.#rightAnswers[j])){
+
+                if (D.match(this.#rightAnswers[j])) {
                     this.#v.rightAnswer(event);
                     break;
                 }
@@ -283,24 +350,51 @@ class Presenter{
                 console.log("Wrong ID!");
                 break;
         }
-        
     }
 
-//--------------------------------Queue--------------------------------
-    #queue;
-    
-    setQueue(index){
-        this.#m.queue(index);
-    }
-    
-    getQueue(index){
-        this.#queue = this.#m.getQueue(index);
-        console.log("Queue Antwort: " + this.#queue)
-        return this.#queue;
-    }
-    
-    delQueue(){
-        this.#m.delQueue();
+    checkAnswerMath(event, j, i, Questions) {
+        let id = event.target.id;
+
+        for(let k = 1; k <= 4; k++){
+            console.log("Möglichkeiten: " + Questions[i][k]);
+        }
+        console.log("RICHITG: " + this.#rightAnswers[j]);
+        
+        
+        switch (id) {
+            case "A":
+                if (Questions[i][1] === this.#rightAnswers[j]) {
+                    this.#v.rightAnswer(event);
+                    break;
+                }
+                this.#v.wrongAnswer(event);
+                break;
+            case "B":
+                if (Questions[i][2] === this.#rightAnswers[j]) {
+                    this.#v.rightAnswer(event);
+                    break;
+                }
+                this.#v.wrongAnswer(event);
+                break;
+            case "C":
+                if (Questions[i][3] === this.#rightAnswers[j]) {
+                    this.#v.rightAnswer(event);
+                    break;
+                }
+                this.#v.wrongAnswer(event);
+                break;
+            case "D":
+                if (Questions[i][4] === this.#rightAnswers[j]) {
+                    this.#v.rightAnswer(event);
+                    break;
+                }
+                this.#v.wrongAnswer(event);
+                break;
+            default:
+                console.log("Wrong ID!");
+                break;
+
+        }
     }
 }
 
@@ -310,20 +404,24 @@ class View {
     #p;
     #hidden = false;
     #rightAnwsers = null;
+    #wrong = 0;
     #Questions = null;
     #Progressbar = 0;
-    #indexQueue = 0;
-    #taskQueue = null;
     #showStatistics = false;
     #showTask = false;
     
     #answerHandle = 0;
     #i = 0;
     #j = 0;
+    #mathCache = new Array(3);
+    
+    //Ajax
+    #Task;
+    #answer;
 
     constructor(p) {
         this.#p = p;
-
+        
         this.setHandler();
     }
 
@@ -336,6 +434,7 @@ class View {
         document.getElementById("Mathe").addEventListener("click", this.callTask.bind(this));
         document.getElementById("IT 1").addEventListener("click", this.callTask.bind(this));
         document.getElementById("Allgemeines").addEventListener("click", this.callTask.bind(this));
+        document.getElementById("Online").addEventListener("click",  this.callAjaxTask.bind(this));
     }
     
     setAnswerHandler(){
@@ -349,39 +448,79 @@ class View {
     
     //Tasks and answers
     callButtonAction(event){
-        if(this.#i < this.#rightAnwsers.length) {
-            this.#p.checkAnswer(event, this.#j);
+        
+        console.log("I: "+ this.#i);
+
+        //Ajax / Online
+        if(document.getElementById("topic").textContent === "Online"){
+        switch (event.target.id){
+            case "A": this.#j = 1; break;
+            case "B": this.#j = 2; break;
+            case "C": this.#j = 3; break;
+            case "D": this.#j = 4; break;
         }
-        else{
-            this.#p.checkAnswer(event, this.#indexQueue);
+            console.log("J: " + this.#j + "; I: " + this.#i); 
+        
+            var bool = this.getAjaxSolve(this.#i, this.#j);
+            this.#i++;
+            console.log("BOOL: " + bool);
+            this.getAjaxTask(this.#i);
+            if(bool){
+                this.rightAnswer(event);
+                return;
+            }
+            this.wrongAnswer(event);
+            return;
         }
+
+        //Mathe
+        if(document.getElementById("topic").textContent === "Mathe"){
+            this.#p.checkAnswerMath(event,this.#j, this.#i, this.#Questions);
+            return;
+        }
+        
+        //Offline
+        this.#p.checkAnswer(event, this.#j);
+        
     }
     
-    async wrongAnswer(event) {
+     async wrongAnswer(event) {
         let button = document.getElementById(event.target.id);
         button.style.backgroundColor = "red";
 
         this.#i++;
         this.#j++;
 
-        if(this.#i >= this.#rightAnwsers.length) {
+        //Ajax
+        if(document.getElementById("topic").textContent === "Online"){
 
-            this.#p.setQueue(this.#taskQueue);
+            this.#wrong++;
             
-            this.#taskQueue = this.getQueueIndex();
-            console.log("Queue index: " + this.#indexQueue);
-            
-            this.setQueueTask(this.#taskQueue);
-            this.setQueueAnswers(this.#taskQueue);
+            if(this.#i > 12){
+                this.showStatistics();
+                return;
+            }
 
-            await new Promise(r => setTimeout(r, 200)); //sleep
+            //set new Task
+            this.setNewTask();
+            this.setNewAnswers();
+
+           await new Promise(r => setTimeout(r, 200)); //sleep
             this.clearButtons(event);
             
-            this.#indexQueue++;
-
+            if(this.#Progressbar === 100){
+                this.showStatistics();
+            }
             return;
         }
-        this.#p.setQueue(this.#i);
+        
+        this.#wrong++;
+        
+        if(this.#i >= this.#rightAnwsers.length) {
+            
+            this.showStatistics();
+            return;
+        }
         
         //set new Task
         this.setNewTask();
@@ -392,38 +531,47 @@ class View {
     }
     
     async rightAnswer(event) {
-        let button = document.getElementById(event.target.id); //sleep
+        let button = document.getElementById(event.target.id);
         button.style.backgroundColor = "green";
 
         this.#j++;
         this.#i++;
         
 
-        //set queue Tasks
-        if(this.#i >= this.#rightAnwsers.length) {
-            //const newLength = this.#i - this.#rightAnwsers.length;
+        //Ajax
+        if(document.getElementById("topic").textContent === "Online"){
             
-            if(this.#Progressbar === 100){
-                this.#showStatistics = false;
+            if(this.#i > 12){
                 this.showStatistics();
                 return;
             }
             
-            this.#taskQueue= this.getQueueIndex();
-            console.log("Queue index: " + this.#taskQueue);
-            this.#indexQueue++;
-            
-            this.#Progressbar += 100 / this.#rightAnwsers.length;
+            //set new Task
+            this.setNewTask();
+            this.setNewAnswers();
+
+            //Progressbar
+            this.#Progressbar += 100 / 10; // 10 is for the amount of tasks
             console.log(this.#Progressbar);
             this.setProgressBar();
-            
-            this.setQueueTask(this.#taskQueue);
-            this.setQueueAnswers(this.#taskQueue);
 
             await new Promise(r => setTimeout(r, 200)); //sleep
             this.clearButtons(event);
-            
+
+            if(this.#Progressbar === 100){
+                this.showStatistics();
+            }
             return;
+        }
+        
+        
+        //set queue Tasks
+        if(this.#i >= this.#rightAnwsers.length && document.getElementById("topic").textContent !== "Online") {
+            //const newLength = this.#i - this.#rightAnwsers.length;
+            
+            this.showStatistics();
+            return;
+                
         }
         
         //set new Task
@@ -441,11 +589,8 @@ class View {
         
         if(this.#Progressbar === 100){
             this.showStatistics();
+            return;
         }
-    }
-    
-    getQueueIndex(){
-        return this.#p.getQueue(this.#indexQueue);
     }
 
     showStatistics(){
@@ -460,42 +605,82 @@ class View {
             const divChild = document.createElement("div");
 
             //child Tasks
-            const divTasks = document.createElement("div");
-            const contentTasks = document.createTextNode("Insgesamt beantwortet: " + this.#i);
-            divTasks.appendChild(contentTasks);
+            if(document.getElementById("topic").textContent !== "Online") {
+                const divTasks = document.createElement("div");
+                const contentTasks = document.createTextNode("Insgesamt beantwortet: " + this.#i);
+                divTasks.appendChild(contentTasks);
 
-            //child Wrong
-            const divWrong = document.createElement("div");
-            const contentWrong = document.createTextNode("Falsch beantwortet: " + this.#indexQueue);
-            divWrong.appendChild(contentWrong);
+                //child Wrong
+                const divWrong = document.createElement("div");
+                const contentWrong = document.createTextNode("Falsch beantwortet: " + this.#wrong);
+                divWrong.appendChild(contentWrong);
 
-            //child Aall
-            let right = this.#i - this.#indexQueue;
-            const divAll = document.createElement("div");
-            const contentAll = document.createTextNode("Richtig beantwortet: " + right);
-            divAll.appendChild(contentAll);
+                //child all
+                let right = this.#i - this.#wrong;
+                const divAll = document.createElement("div");
+                const contentAll = document.createTextNode("Richtig beantwortet: " + right);
+                divAll.appendChild(contentAll);
 
-            divChild.appendChild(divTasks);
-            divChild.appendChild(divWrong);
-            divChild.appendChild(divAll);
-            div.appendChild(divChild);
+                divChild.appendChild(divTasks);
+                divChild.appendChild(divWrong);
+                divChild.appendChild(divAll);
+                div.appendChild(divChild);
 
-            divChild.className = "statistic";
-            div.className = "statisticPlaceholder";
+                divChild.className = "statistic";
+                div.className = "statisticPlaceholder";
 
-            const taskElement = document.getElementById("task");
-            const parent = taskElement.parentNode;
-            parent.insertBefore(div, taskElement);
-            parent.removeChild(taskElement);
+                const taskElement = document.getElementById("task");
+                const parent = taskElement.parentNode;
+                parent.insertBefore(div, taskElement);
+                parent.removeChild(taskElement);
 
-            //sets all to 0
-            this.#Progressbar = 0;
-            this.#i = 0;
-            this.#j = 0;
-            this.#indexQueue = 0;
-            this.#rightAnwsers = null;
-            this.#Questions = null;
+                //sets all to 0
+                this.setNull();
+            }
+            else{
+                const divTasks = document.createElement("div");
+                let all = this.#i-3;
+                const contentTasks = document.createTextNode("Insgesamt beantwortet: " + all); //anfangs Task
+                divTasks.appendChild(contentTasks);
+
+                //child Wrong
+                const divWrong = document.createElement("div");
+                const contentWrong = document.createTextNode("Falsch beantwortet: " + this.#wrong);
+                divWrong.appendChild(contentWrong);
+
+                //child all
+                let right = all - this.#wrong;
+                const divAll = document.createElement("div");
+                const contentAll = document.createTextNode("Richtig beantwortet: " + right);
+                divAll.appendChild(contentAll);
+
+                divChild.appendChild(divTasks);
+                divChild.appendChild(divWrong);
+                divChild.appendChild(divAll);
+                div.appendChild(divChild);
+
+                divChild.className = "statistic";
+                div.className = "statisticPlaceholder";
+
+                const taskElement = document.getElementById("task");
+                const parent = taskElement.parentNode;
+                parent.insertBefore(div, taskElement);
+                parent.removeChild(taskElement);
+
+                //sets all to 0
+                this.setNull();
+            }
         }
+    }
+    
+    setNull(){
+        this.#Progressbar = 0;
+        this.#i = 0;
+        this.#j = 0;
+        this.#rightAnwsers = null;
+        this.#Questions = null;
+        this.#answerHandle = 0;
+        this.#wrong = 0;
     }
     
     setProgressBar(){
@@ -510,27 +695,103 @@ class View {
     }
     
     setNewTask(){
+        
+        if(document.getElementById("topic").textContent === "Mathe"){
+            //render Katex
+            katex.render(this.#Questions[this.#i][0], document.getElementById("question"));
+            return;
+        }
+        
+        if(document.getElementById("topic").textContent === "Online"){
+            
+            document.getElementById("question").textContent = this.#Task;
+            console.log(this.#Task);
+            return;
+        }
+        
         document.getElementById("question").textContent = this.#Questions[this.#i][0];
     }
 
-    setQueueTask(index){
-        console.log("INDEX QUEUE: " + index)
-        document.getElementById("question").textContent = this.#Questions[index][0];
-    }
-
     setNewAnswers(){
+
+        if(document.getElementById("topic").textContent === "Mathe"){
+            //render Katex
+
+            katex.render("A: " + this.#Questions[this.#i][1],  document.getElementById("answerA"));
+            katex.render("B: " + this.#Questions[this.#i][2],  document.getElementById("answerB"));
+            katex.render("C: " + this.#Questions[this.#i][3],  document.getElementById("answerC"));
+            katex.render("D: " + this.#Questions[this.#i][4],  document.getElementById("answerD"));
+            return;
+        }
+        
+        if(document.getElementById("topic").textContent === "Online"){
+            
+            document.getElementById("answerA").textContent = "A: " + this.#answer[0];
+            document.getElementById("answerB").textContent = "B: " + this.#answer[1];
+            document.getElementById("answerC").textContent = "C: " + this.#answer[2];
+            document.getElementById("answerD").textContent = "D: " + this.#answer[3];
+            
+            return;
+        }
+        
         document.getElementById("answerA").textContent = "A: " + this.#Questions[this.#i][1];
         document.getElementById("answerB").textContent = "B: " + this.#Questions[this.#i][2];
         document.getElementById("answerC").textContent = "C: " + this.#Questions[this.#i][3];
         document.getElementById("answerD").textContent = "D: " + this.#Questions[this.#i][4];
     }
-
-    setQueueAnswers(index){
-        document.getElementById("answerA").textContent = "A: " + this.#Questions[index][1];
-        document.getElementById("answerB").textContent = "B: " + this.#Questions[index][2];
-        document.getElementById("answerC").textContent = "C: " + this.#Questions[index][3];
-        document.getElementById("answerD").textContent = "D: " + this.#Questions[index][4];
+    
+    checkOnline(){
+        if(!(navigator.onLine)){
+            document.getElementById("topic").textContent = "Sie haben keinen Zugang zum Internet!";
+            return;
+        }
     }
+    
+    
+    callAjaxTask(event){
+        
+        this.checkOnline();
+
+        this.#rightAnwsers = 0;
+        this.#Questions = 0;
+        this.#j = 0;
+        this.#i = 2;
+        this.#Progressbar = 0;
+
+        this.getAjaxTask(this.#i);
+        
+        document.getElementById("topic").textContent = "Online";
+
+        if(document.getElementById("progressBar")) {
+            this.setProgressBar();
+        }
+
+        this.showTask();
+        
+        if(this.#answerHandle === 0) {
+            this.setAnswerHandler();
+        }
+        this.#answerHandle++;
+        
+        this.setNewTask();
+        this.setNewAnswers();
+        this.actSidebar(event);
+    }
+    
+    getAjaxTask(index){
+        this.#p.initializeAjaxTask(index);
+        this.#Task =this.#p.getTask();
+        console.log("TASK 3: "+ this.#Task)
+        this.#answer =this.#p.getAnswer();
+        
+        console.log("asöküfjsdklj" + this.#Task + " " + this.#answer);
+    }
+    
+    getAjaxSolve(index, data){
+        const bool = this.#p.getAjaxSolve(index, data);
+        return bool;
+    }
+    
     
     callTask(event){
         this.#rightAnwsers = null;
@@ -538,11 +799,20 @@ class View {
         const {shuffledQuestions, rightAnswers} =this.#p.Task(event);
         this.#rightAnwsers = rightAnswers;
         this.#Questions = shuffledQuestions;
-        this.#indexQueue = 0;
-        this.#p.delQueue();
         this.#i = 0;
         this.#j = 0;
         this.#Progressbar = 0;
+        this.#wrong = 0;
+        
+        if(event.target.id === "Mathe"){
+            document.getElementById("topic").textContent = "Mathe";
+        }
+        if(event.target.id === "Allgemeines"){
+            document.getElementById("topic").textContent = "Allgemeines";
+        }
+        if(event.target.id === "IT 1"){
+            document.getElementById("topic").textContent = "IT 1";
+        }
         
         if(document.getElementById("progressBar")) {
             this.setProgressBar();
@@ -554,6 +824,7 @@ class View {
             this.setAnswerHandler();
         }
         this.#answerHandle++;
+        
         this.setNewTask();
         this.setNewAnswers();
         this.actSidebar(event);
@@ -679,8 +950,6 @@ class View {
     }
     
 
-    
-    
     //Sidebar
     actSidebar(event) {
 
@@ -717,7 +986,7 @@ class View {
                     console.log("Sidebar is shown!");
                 }
             }
-            else if(event.target.id === "IT 1" || event.target.id === "Allgemeines" || event.target.id === "Mathe"){
+            else if(event.target.id === "IT 1" || event.target.id === "Allgemeines" || event.target.id === "Mathe" || event.target.id === "Online"){
                 this.#hidden = true;
                 let sidebar = document.getElementById("sidebar");
                 sidebar.style.marginLeft = "-30vw";

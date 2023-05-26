@@ -11,4 +11,4 @@
 - 1 Thema ist die Online-Funktionalität
 - Offline: Mathe, Internettechnologien und Allgemeinwissen
 - Online: Berühmte Personen
-- --> Jeweils 10 Fragen
+- ==> Jeweils 10 Fragen

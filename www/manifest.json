@@ -1,0 +1,18 @@
+{
+  "id": "/",
+  "dir": "ltr",
+  "lang": "de-DE",
+  "name": "PWA",
+  "short_name": "PWA",
+  "start_url": "/index.html",
+  "description": "Lernapp als PWA für IT-1",
+  "icons": [{
+    "src": "/Image/PWA_Image.png",
+    "type": "image/png",
+    "sizes": "512x512"
+  }],
+  "background_color": "white",
+  "theme_color": "#f4f4f4",
+  "display": "standalone",
+  "orientation": "portrait-primary"
+}

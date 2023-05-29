@@ -129,14 +129,6 @@ button:hover{
  border:none;
 }
 
-button:active{
- opacity: 0.5;
- border:none;
- background: #90EE90;
-
- transition-duration: 20s;
-}
-
 a:hover{
  opacity: 0.5;
  border:none;

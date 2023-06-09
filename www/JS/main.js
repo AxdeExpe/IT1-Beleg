@@ -1,5 +1,6 @@
 "use strict"
 
+//start of program
 document.addEventListener('DOMContentLoaded', function (){
     let m, p, v;
     
@@ -7,10 +8,10 @@ document.addEventListener('DOMContentLoaded', function (){
     p = new Presenter();
     v = new View(p);
     p.setModelAndView(m,v);
-    p.start();
 
+    //service worker
     if('serviceWorker' in navigator){
-        navigator.serviceWorker.register("/sw.js")
+        navigator.serviceWorker.register("./sw.js")
             .then((reg) => console.log("service worker registered!", reg))
             .catch((err) => console.log("service worker not registered", err));
     }
@@ -58,6 +59,7 @@ class Model {
             }
         }
 
+        //get a quiz
         this.#xhr.open('GET', 'https://irene.informatik.htw-dresden.de:8888/api/quizzes/' + index, false);
         this.#xhr.setRequestHeader("Authorization", "Basic " + btoa("test@gmail.com:secret"));
         this.#xhr.send(null);
@@ -77,6 +79,8 @@ class Model {
                 self.setSolve(bool);
             }
         };
+
+        //get answer (true, false)
         this.#xhr.open('POST', 'https://irene.informatik.htw-dresden.de:8888/api/quizzes/' + index + '/solve', false);
         this.#xhr.setRequestHeader("Authorization", "Basic " + btoa("test@gmail.com:secret"));
         this.#xhr.setRequestHeader("Content-Type", "application/json");
@@ -91,22 +95,22 @@ class Model {
             this.#answer[i] = json.options[i];
         }
     }
-    
+
+    //task
     getTask(){
         return this.#Task;
     }
-    
+
+    //answer for task
     getAnswer(){
         return this.#answer;
     }
 
     initializeTask(index) {
         this.sendXHR(index);
-
-        //console.log("Task 2: " + this.#Task)
-        //console.log("Answer 2: " + this.#answer);
     }
 
+    //solution
     setSolve(bool) {
         this.#solve = bool;
     }
@@ -119,6 +123,7 @@ class Model {
 
 //-------------------------------LoadFiles--------------------------------
 
+    //loads math tasks into an array
     loadMathe() {
         fetch("JSON/Mathe.json")
             .then(response => response.json())
@@ -141,6 +146,8 @@ class Model {
             });
     }
 
+
+    //laods Allgemeine tasks into a array
     loadAllgemeines() {
         fetch("JSON/Allgemeines.json")
             .then(response => response.json())
@@ -163,6 +170,7 @@ class Model {
             });
     }
 
+    //load IT1 int a array
     loadIT1() {
         fetch("JSON/IT 1.json")
             .then(response => response.json())
@@ -239,11 +247,6 @@ class Presenter{
     #m;
     #v;
 
-    start(){
-        //this.setXhr(this.#m.getAjax());
-       // this.#v.getFirstAjax();
-    }
-
     setModelAndView(m, v){
         this.#m = m;
         this.#v = v;
@@ -253,6 +256,7 @@ class Presenter{
     #rightAnswers = []
     #shuffledQuestions
 
+    //return the chosen tasks
     Task(event){
         let topic = event.target.id;
         this.#shuffledQuestions = null;
@@ -306,7 +310,8 @@ class Presenter{
 //--------------------------------Answer--------------------------------
     checkAnswer(event, j){
         let id = event.target.id;
-        
+
+        //check the answers
         switch(id) {
             case "A":
                 let A = document.getElementById("answerA").textContent;
@@ -350,6 +355,7 @@ class Presenter{
         }
     }
 
+    //only for math
     checkAnswerMath(event, j, i, Questions) {
         let id = event.target.id;
         
@@ -395,7 +401,7 @@ class View {
     //Objects
     #p;
     #hidden = false;
-    #rightAnwsers = null;
+    #rightAnswers = null;
     #wrong = 0;
     #Questions = null;
     #Progressbar = 0;
@@ -403,9 +409,8 @@ class View {
     #showTask = false;
     
     #answerHandle = 0;
-    #i = 0;
-    #j = 0;
-    #mathCache = new Array(3);
+    #i = 0; //index
+    #j = 0; //index
     
     //Ajax
     #Task;
@@ -417,6 +422,7 @@ class View {
         this.setHandler();
     }
 
+    //handler
     setHandler() {
 
         //control button
@@ -450,7 +456,6 @@ class View {
             case "D": this.#j = 3; break;
         }
             var bool = this.getAjaxSolve(this.#i, this.#j);
-            //console.log("BOOL: " + bool);
             
             this.#i++;
             if(bool){
@@ -476,14 +481,11 @@ class View {
         let button = document.getElementById(event.target.id);
         button.style.backgroundColor = "red";
 
-        this.#i++;
-        this.#j++;
 
         //Ajax
         if(document.getElementById("topic").textContent === "Online"){
 
             this.#wrong++;
-            this.#i--;
 
             if(this.#i >= 12){
                 this.showStatistics();
@@ -491,6 +493,7 @@ class View {
             }
 
             this.getAjaxTask(this.#i);
+
             //set new Task
             this.setNewTask();
             this.setNewAnswers();
@@ -504,9 +507,38 @@ class View {
             return;
         }
         
-        this.#wrong++;
         
-        if(this.#i >= this.#rightAnwsers.length) {
+         //shows the correct answer
+        if(document.getElementById("answerA").textContent.includes(this.#rightAnswers[this.#i])){
+            document.getElementById("answerA").style.backgroundColor = "green";
+            await new Promise(r => setTimeout(r, 1000)); //sleep
+            document.getElementById("answerA").style.backgroundColor = null;
+        }
+        
+         if(document.getElementById("answerB").textContent.includes(this.#rightAnswers[this.#i])){
+             document.getElementById("answerB").style.backgroundColor = "green";
+             await new Promise(r => setTimeout(r, 1000)); //sleep
+             document.getElementById("answerB").style.backgroundColor = null;
+         }
+         
+         if(document.getElementById("answerC").textContent.includes(this.#rightAnswers[this.#i])){
+             document.getElementById("answerC").style.backgroundColor = "green";
+             await new Promise(r => setTimeout(r, 1000)); //sleep
+             document.getElementById("answerC").style.backgroundColor = null;
+         }
+
+         if(document.getElementById("answerD").textContent.includes(this.#rightAnswers[this.#i])){
+             document.getElementById("answerD").style.backgroundColor = "green";
+             await new Promise(r => setTimeout(r, 1000)); //sleep
+             document.getElementById("answerD").style.backgroundColor = null;
+         }
+         
+         
+         this.#i++;
+         this.#j++;
+         this.#wrong++;
+        
+        if(this.#i >= this.#rightAnswers.length) {
             
             this.showStatistics();
             return;
@@ -516,10 +548,9 @@ class View {
         this.setNewTask();
         this.setNewAnswers();
         
-        await new Promise(r => setTimeout(r, 200)); //sleep
         this.clearButtons(event);
     }
-    
+
     async rightAnswer(event) {
         let button = document.getElementById(event.target.id);
         button.style.backgroundColor = "green";
@@ -538,7 +569,8 @@ class View {
             }
 
             this.getAjaxTask(this.#i);
-            
+
+            await new Promise(r => setTimeout(r, 900)); //sleep
             //set new Task
             this.setNewTask();
             this.setNewAnswers();
@@ -551,6 +583,7 @@ class View {
             this.clearButtons(event);
 
             if(this.#Progressbar === 100){
+                await new Promise(r => setTimeout(r, 1000)); //sleep
                 this.showStatistics();
             }
             return;
@@ -558,20 +591,22 @@ class View {
         
         
         //set queue Tasks
-        if(this.#i >= this.#rightAnwsers.length && document.getElementById("topic").textContent !== "Online") {
-            //const newLength = this.#i - this.#rightAnwsers.length;
-            
+        if(this.#i >= this.#rightAnswers.length && document.getElementById("topic").textContent !== "Online") {
+            //const newLength = this.#i - this.#rightAnswers.length;
+            await new Promise(r => setTimeout(r, 1000)); //sleep
             this.showStatistics();
             return;
                 
         }
+
+        await new Promise(r => setTimeout(r, 1000)); //sleep
         
         //set new Task
         this.setNewTask();
         this.setNewAnswers();
 
         //Progressbar
-        this.#Progressbar += 100 / this.#rightAnwsers.length;
+        this.#Progressbar += 100 / this.#rightAnswers.length;
         this.setProgressBar();
 
         await new Promise(r => setTimeout(r, 200)); //sleep
@@ -663,33 +698,40 @@ class View {
             }
         }
     }
-    
+
+    //sets everything to null or 0
     setNull(){
         this.#Progressbar = 0;
         this.#i = 0;
         this.#j = 0;
-        this.#rightAnwsers = null;
+        this.#rightAnswers = null;
         this.#Questions = null;
         this.#answerHandle = 0;
         this.#wrong = 0;
     }
-    
+
+    //progressbar progress
     setProgressBar(){
         let progress = document.getElementById("progressBar");
         progress.textContent = this.#Progressbar + "%";
         progress.style.width = this.#Progressbar + "%";
     }
-    
+
+    //clears the pushed button
     clearButtons(event){
         let button =  document.getElementById(event.target.id);
         button.style.backgroundColor = null;
     }
-    
+
+    //sets new task
     setNewTask(){
         
         if(document.getElementById("topic").textContent === "Mathe"){
             //render Katex
             katex.render(this.#Questions[this.#i][0], document.getElementById("question"));
+            window.renderMathInElement(document.getElementById("question"), {delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}]});
             return;
         }
         
@@ -703,6 +745,7 @@ class View {
         document.getElementById("question").textContent = this.#Questions[this.#i][0];
     }
 
+    //sets new answers
     setNewAnswers(){
 
         if(document.getElementById("topic").textContent === "Mathe"){
@@ -730,7 +773,8 @@ class View {
         document.getElementById("answerC").textContent = "C: " + this.#Questions[this.#i][3];
         document.getElementById("answerD").textContent = "D: " + this.#Questions[this.#i][4];
     }
-    
+
+    //checks if your device has an internet connection
     checkOnline(){
         if(!(navigator.onLine)){
             document.getElementById("topic").textContent = "Sie haben keinen Zugang zum Internet!";
@@ -738,12 +782,12 @@ class View {
         }
     }
     
-    
+    //Online
     callAjaxTask(event){
         
         this.checkOnline();
 
-        this.#rightAnwsers = 0;
+        this.#rightAnswers = 0;
         this.#Questions = 0;
         this.#j = 0;
         this.#i = 2;
@@ -782,12 +826,12 @@ class View {
         return bool;
     }
     
-    
+    //Offline
     callTask(event){
-        this.#rightAnwsers = null;
+        this.#rightAnswers = null;
         this.#Questions = null;
         const {shuffledQuestions, rightAnswers} =this.#p.Task(event);
-        this.#rightAnwsers = rightAnswers;
+        this.#rightAnswers = rightAnswers;
         this.#Questions = shuffledQuestions;
         this.#i = 0;
         this.#j = 0;
@@ -819,7 +863,8 @@ class View {
         this.setNewAnswers();
         this.actSidebar(event);
     }
-    
+
+    //shows the task with the possible answers
     showTask(){
         if(this.#showStatistics === true){
            document.getElementById("statistic").remove();
@@ -860,7 +905,7 @@ class View {
             //create <p>'s
             const question = document.createElement("p");
             question.id = "question";
-            question.innerHTML = "Aufgabe";
+            //question.innerHTML = "Aufgabe";
 
             const answerA = document.createElement("p");
             answerA.id = "answerA";
@@ -947,6 +992,7 @@ class View {
 
             if (event.target.id === "handler") {
 
+                //is shown
                 if (this.#hidden === false) {
                     this.#hidden = true;
                     let sidebar = document.getElementById("sidebar");
@@ -961,6 +1007,7 @@ class View {
 
                     //console.log("Sidebar is hidden!");
                 }
+                //is hidden
                 else {
                     this.#hidden = false;
                     let sidebar = document.getElementById("sidebar");

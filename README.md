@@ -10,5 +10,5 @@
 - 3 Auswahlmöglichkeiten von Themen sind Offline vorhanden
 - 1 Thema ist die Online-Funktionalität
 - Offline: Mathe, Internettechnologien und Allgemeinwissen
-- Online: Berühmte Personen
+- Online: Historisch berühmte Personen
 - ==> Jeweils 10 Fragen
